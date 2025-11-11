@@ -281,15 +281,35 @@ else:
                 None
             )
 
+            # Normalize level names (handle both abbreviated and full names)
+            level_map = {
+                'E': 'Emerging',
+                'D': 'Developing',
+                'P': 'Proficient',
+                'A': 'Advanced',
+                'Emerging': 'Emerging',
+                'Developing': 'Developing',
+                'Proficient': 'Proficient',
+                'Advanced': 'Advanced'
+            }
+
             default_starting = "Emerging"
             if current_skill_data and current_skill_data["assessments"]:
-                default_starting = current_skill_data["assessments"][-1]["level"]
+                raw_level = current_skill_data["assessments"][-1]["level"]
+                default_starting = level_map.get(raw_level, "Emerging")
+
+            # Determine starting level index (exclude Advanced from options)
+            starting_options = ["Emerging", "Developing", "Proficient"]
+            try:
+                default_index = starting_options.index(default_starting)
+            except ValueError:
+                # If default_starting is "Advanced", default to "Proficient"
+                default_index = 2
 
             starting_level = st.selectbox(
                 "Starting Level",
-                options=["Emerging", "Developing", "Proficient"],
-                index=["Emerging", "Developing", "Proficient", "Advanced"].index(default_starting)
-                    if default_starting != "Advanced" else 2
+                options=starting_options,
+                index=default_index
             )
 
         # Target level
@@ -297,32 +317,38 @@ else:
         starting_idx = level_order.index(starting_level)
         possible_targets = level_order[starting_idx + 1:]
 
+        # Always show target level selection and submit button
         if not possible_targets:
             st.error("Cannot create target: already at Advanced level")
-            submit_manual = None
+            target_level = None
         else:
             target_level = st.selectbox(
                 "Target Level",
                 options=possible_targets
             )
 
-            submit_manual = st.form_submit_button("🎯 Assign Target", use_container_width=True)
+        # Always include submit button (required by Streamlit forms)
+        submit_manual = st.form_submit_button(
+            "🎯 Assign Target",
+            use_container_width=True,
+            disabled=(not possible_targets)
+        )
 
-        if submit_manual:
-            try:
-                teacher_id, _ = get_teacher()
-                target_data = {
-                    "student_id": selected_student,
-                    "skill_name": selected_skill,
-                    "starting_level": starting_level,
-                    "target_level": target_level,
-                    "assigned_by": teacher_id
-                }
-                APIClient.assign_target(selected_student, target_data)
-                st.success(f"Target assigned: {selected_skill} ({format_level_transition(starting_level, target_level)})")
-                st.rerun()
-            except Exception as e:
-                st.error(f"Error assigning target: {str(e)}")
+    if submit_manual and possible_targets:
+        try:
+            teacher_id, _ = get_teacher()
+            target_data = {
+                "student_id": selected_student,
+                "skill_name": selected_skill,
+                "starting_level": starting_level,
+                "target_level": target_level,
+                "assigned_by": teacher_id
+            }
+            APIClient.assign_target(selected_student, target_data)
+            st.success(f"Target assigned: {selected_skill} ({format_level_transition(starting_level, target_level)})")
+            st.rerun()
+        except Exception as e:
+            st.error(f"Error assigning target: {str(e)}")
 
 st.markdown("---")
 

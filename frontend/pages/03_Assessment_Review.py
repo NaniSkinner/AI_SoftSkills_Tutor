@@ -208,7 +208,17 @@ with col_left:
 
     # Current level with badge - Flourish styled
     level = current_assessment['level']
-    level_emoji = get_level_emoji(level)
+
+    # Map abbreviations to full level names if needed
+    level_map = {
+        "E": "Emerging",
+        "D": "Developing",
+        "P": "Proficient",
+        "A": "Advanced"
+    }
+    full_level_name = level_map.get(level, level)  # Use abbreviation mapping or original if already full name
+
+    level_emoji = get_level_emoji(full_level_name)
 
     # Map level to Flourish colors
     level_colors = {
@@ -217,7 +227,7 @@ with col_left:
         "Proficient": "background: linear-gradient(135deg, #3a5a44, #3d8a96); color: white;",
         "Advanced": "background: linear-gradient(135deg, #d67e3a, #ef9f32); color: white;"
     }
-    level_style = level_colors.get(level, "background: #e8e5df; color: #2c3e30;")
+    level_style = level_colors.get(full_level_name, "background: #e8e5df; color: #2c3e30;")
 
     st.markdown(f"""
     <div style="
@@ -228,7 +238,7 @@ with col_left:
         margin: 12px 0;
         box-shadow: 0 4px 8px rgba(58, 90, 68, 0.15);
     ">
-        <h2 style="margin: 0; font-family: 'DM Serif Display', serif;">{level_emoji} {level}</h2>
+        <h2 style="margin: 0; font-family: 'DM Serif Display', serif;">{level_emoji} {full_level_name}</h2>
     </div>
     """, unsafe_allow_html=True)
 
@@ -304,10 +314,19 @@ with action_tabs[1]:
 
     with st.form("correction_form"):
         # Corrected level
+        # Map abbreviations to full level names if needed
+        level_map = {
+            "E": "Emerging",
+            "D": "Developing",
+            "P": "Proficient",
+            "A": "Advanced"
+        }
+        full_level = level_map.get(level, level)  # Use abbreviation mapping or original if already full name
+
         corrected_level = st.selectbox(
             "Corrected Level",
             options=["Emerging", "Developing", "Proficient", "Advanced"],
-            index=["Emerging", "Developing", "Proficient", "Advanced"].index(level)
+            index=["Emerging", "Developing", "Proficient", "Advanced"].index(full_level)
         )
 
         # Corrected justification

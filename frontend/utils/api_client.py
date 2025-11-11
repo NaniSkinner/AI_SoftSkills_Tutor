@@ -228,7 +228,10 @@ class APIClient:
         """
         try:
             url = f"{BACKEND_URL}/api/corrections/assessments/{assessment_id}/approve"
-            data = {"approved_by": approved_by}
+            data = {
+                "assessment_id": assessment_id,
+                "approved_by": approved_by
+            }
 
             logger.info(f"Approving assessment {assessment_id}")
             response = requests.post(url, json=data, timeout=10)
