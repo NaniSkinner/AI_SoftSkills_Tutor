@@ -198,7 +198,7 @@ try:
         dates = [a["date"] for a in assessments]
         levels_numeric = [a["level_numeric"] for a in assessments]
         levels_text = [a["level"] for a in assessments]
-        confidences = [a["confidence"] for a in assessments]
+        confidences = [float(a["confidence"]) for a in assessments]
 
         # Create Plotly chart
         fig = go.Figure()
@@ -210,8 +210,15 @@ try:
             mode='lines+markers',
             name=selected_skill,
             line=dict(color='#3a5a44', width=3),
-            marker=dict(size=12, color=confidences, colorscale='YlGn',
-                       showscale=True, colorbar=dict(title="Confidence")),
+            marker=dict(
+                size=12,
+                color=confidences,
+                colorscale='YlGn',
+                showscale=True,
+                colorbar=dict(title="Confidence"),
+                cmin=0.0,
+                cmax=1.0
+            ),
             text=levels_text,
             hovertemplate="<b>%{text}</b><br>Date: %{x}<br>Confidence: %{marker.color:.2f}<extra></extra>"
         ))
@@ -244,7 +251,7 @@ try:
             assessment_data.append({
                 "Date": a["date"],
                 "Level": a["level"],
-                "Confidence": f"{a['confidence']:.2f}"
+                "Confidence": f"{float(a['confidence']):.2f}"
             })
 
         df = pd.DataFrame(assessment_data)
