@@ -9,7 +9,9 @@ import sys
 import os
 
 # Add parent directory to path for imports
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+parent_dir = os.path.dirname(os.path.dirname(__file__))
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
 
 from utils.api_client import APIClient
 from utils.session_utils import (
@@ -18,20 +20,29 @@ from utils.session_utils import (
     get_review_progress, reset_review_state
 )
 from utils.badge_utils import get_badge_color, get_level_emoji
+from utils.icon_utils import render_icon, get_page_icon
 
 # Page configuration
 st.set_page_config(
     page_title="Assessment Review - Flourish Skills Tracker",
-    page_icon="✅",
+    page_icon="🌿",
     layout="wide"
 )
 
 # Initialize session state
 initialize_session_state()
 
-# Page header
-st.title("✅ Assessment Review")
-st.markdown("Review and correct AI-generated skill assessments")
+# Page header with icon
+title_html = f"""
+<div style="display: flex; align-items: center; margin-bottom: 0;">
+    {get_page_icon("review", color="#3a5a44", size=44)}
+    <h1 style="margin-left: 16px; margin-bottom: 0; color: #2c4733; font-family: 'DM Serif Display', serif;">
+        Assessment Review
+    </h1>
+</div>
+"""
+st.markdown(title_html, unsafe_allow_html=True)
+st.markdown("### Review and correct AI-generated skill assessments")
 st.markdown("---")
 
 # Sidebar filters
@@ -195,32 +206,48 @@ with col_left:
     st.markdown(f"**Skill:** {current_assessment['skill_name']} ({current_assessment['skill_category']})")
     st.markdown(f"**Date Created:** {current_assessment['created_at'][:10]}")
 
-    # Current level with badge
+    # Current level with badge - Flourish styled
     level = current_assessment['level']
     level_emoji = get_level_emoji(level)
-    level_color = get_badge_color(level)
+
+    # Map level to Flourish colors
+    level_colors = {
+        "Emerging": "background: #e8e5df; color: #2c3e30; border: 2px solid #6b8456;",
+        "Developing": "background: linear-gradient(135deg, #6b8456, #8ba068); color: white;",
+        "Proficient": "background: linear-gradient(135deg, #3a5a44, #3d8a96); color: white;",
+        "Advanced": "background: linear-gradient(135deg, #d67e3a, #ef9f32); color: white;"
+    }
+    level_style = level_colors.get(level, "background: #e8e5df; color: #2c3e30;")
 
     st.markdown(f"""
     <div style="
-        background-color: {level_color};
-        padding: 15px;
-        border-radius: 10px;
+        {level_style}
+        padding: 18px;
+        border-radius: 24px;
         text-align: center;
-        margin: 10px 0;
+        margin: 12px 0;
+        box-shadow: 0 4px 8px rgba(58, 90, 68, 0.15);
     ">
-        <h2 style="margin: 0; color: #333;">{level_emoji} {level}</h2>
+        <h2 style="margin: 0; font-family: 'DM Serif Display', serif;">{level_emoji} {level}</h2>
     </div>
     """, unsafe_allow_html=True)
 
-    # Confidence score
+    # Confidence score with Flourish colors
     confidence = current_assessment['confidence_score']
-    confidence_color = "#2ecc71" if confidence >= 0.7 else "#e74c3c"
+    confidence_color = "#3a5a44" if confidence >= 0.7 else "#d67e3a"
 
     st.markdown(f"**Confidence Score:** {confidence:.2f}")
     st.progress(confidence)
 
     if confidence < 0.7:
-        st.warning("⚠️ Low confidence - AI is uncertain about this assessment")
+        warning_icon = render_icon("alert-circle", color="#d67e3a", size=20, inline=True)
+        st.markdown(f"""
+        <div style="background-color: #fef7ed; padding: 12px; border-radius: 12px;
+                     border-left: 4px solid #d67e3a; margin-top: 8px;
+                     font-family: 'Inter', sans-serif; color: #7a4f1a;">
+            {warning_icon} Low confidence - AI is uncertain about this assessment
+        </div>
+        """, unsafe_allow_html=True)
 
 with col_right:
     st.markdown("### 📊 Statistics")

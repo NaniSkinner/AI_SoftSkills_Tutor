@@ -13,24 +13,35 @@ import os
 from datetime import datetime
 
 # Add parent directory to path for imports
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+parent_dir = os.path.dirname(os.path.dirname(__file__))
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
 
 from utils.api_client import APIClient
 from utils.session_utils import initialize_session_state, get_selected_student
 from utils.badge_utils import get_level_numeric, get_progress_color, render_badge_html
+from utils.icon_utils import render_icon, get_page_icon
 
 # Page configuration
 st.set_page_config(
     page_title="Skill Trends - Flourish Skills Tracker",
-    page_icon="📈",
+    page_icon="🌿",
     layout="wide"
 )
 
 # Initialize session state
 initialize_session_state()
 
-# Page header
-st.title("📈 Skill Trends & Progress")
+# Page header with icon
+title_html = f"""
+<div style="display: flex; align-items: center; margin-bottom: 0;">
+    {get_page_icon("trends", color="#3a5a44", size=44)}
+    <h1 style="margin-left: 16px; margin-bottom: 0; color: #2c4733; font-family: 'DM Serif Display', serif;">
+        Skill Trends & Progress
+    </h1>
+</div>
+"""
+st.markdown(title_html, unsafe_allow_html=True)
 st.markdown("---")
 
 # Student selection
@@ -192,14 +203,14 @@ try:
         # Create Plotly chart
         fig = go.Figure()
 
-        # Add line and markers
+        # Add line and markers with Flourish green color
         fig.add_trace(go.Scatter(
             x=dates,
             y=levels_numeric,
             mode='lines+markers',
             name=selected_skill,
-            line=dict(color='#3498db', width=3),
-            marker=dict(size=12, color=confidences, colorscale='RdYlGn',
+            line=dict(color='#3a5a44', width=3),
+            marker=dict(size=12, color=confidences, colorscale='YlGn',
                        showscale=True, colorbar=dict(title="Confidence")),
             text=levels_text,
             hovertemplate="<b>%{text}</b><br>Date: %{x}<br>Confidence: %{marker.color:.2f}<extra></extra>"

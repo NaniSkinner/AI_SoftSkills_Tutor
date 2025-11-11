@@ -1,0 +1,26 @@
+# Flourish Schools Theme Configuration
+# Custom styling for the Flourish Skills Tracker dashboard
+
+[theme]
+# Primary colors - Flourish green palette (softened for readability)
+primaryColor = "#3a5a44"          # Softened forest green for interactive elements
+backgroundColor = "#faf7f2"        # Warm cream background
+secondaryBackgroundColor = "#f0ebe3"  # Slightly darker cream for cards
+textColor = "#2c3e30"              # Dark green-black for text
+
+# Font configuration
+font = "sans serif"                # Will be overridden by custom fonts in CSS
+
+[server]
+# Server configuration
+headless = true
+port = 8501
+
+[browser]
+# Browser configuration
+gatherUsageStats = false
+
+# UI Configuration
+[ui]
+hideTopBar = false
+hideSidebarNav = false

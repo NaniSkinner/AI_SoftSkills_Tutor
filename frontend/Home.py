@@ -5,16 +5,19 @@ import streamlit as st
 import sys
 import os
 
-# Add utils to path
-sys.path.append(os.path.dirname(__file__))
+# Add current directory to path for utils imports
+current_dir = os.path.dirname(os.path.abspath(__file__))
+if current_dir not in sys.path:
+    sys.path.insert(0, current_dir)
 
 from utils.api_client import APIClient
 from utils.session_utils import initialize_session_state, set_teacher, get_teacher
+from utils.icon_utils import render_icon, get_page_icon
 
 # Page configuration
 st.set_page_config(
     page_title="Flourish Skills Tracker - Teacher Dashboard",
-    page_icon="🌟",
+    page_icon="🌿",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -25,8 +28,16 @@ initialize_session_state()
 # Get backend URL from environment
 BACKEND_URL = os.getenv("BACKEND_URL", "http://backend:8000")
 
-# Title and welcome message
-st.title("🌟 Flourish Skills Tracker")
+# Title and welcome message with icon
+title_html = f"""
+<div style="display: flex; align-items: center; margin-bottom: 0;">
+    {get_page_icon("home", color="#3a5a44", size=48)}
+    <h1 style="margin-left: 16px; margin-bottom: 0; color: #2c4733; font-family: 'DM Serif Display', serif;">
+        Flourish Skills Tracker
+    </h1>
+</div>
+"""
+st.markdown(title_html, unsafe_allow_html=True)
 st.markdown("### Teacher Dashboard - AI-Powered Soft Skills Assessment")
 
 st.markdown("---")
@@ -115,34 +126,44 @@ st.markdown("### 🚀 Quick Navigation")
 nav_col1, nav_col2 = st.columns(2)
 
 with nav_col1:
-    st.markdown("""
+    students_icon = render_icon("users", color="white", size=32, inline=False)
+    st.markdown(f"""
     <div style="
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 25px;
-        border-radius: 15px;
-        margin: 10px 0;
+        background: linear-gradient(135deg, #3a5a44 0%, #6b8456 100%);
+        padding: 28px;
+        border-radius: 24px;
+        margin: 12px 0;
         color: white;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        box-shadow: 0 5px 12px rgba(58, 90, 68, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.1);
     ">
-        <h3 style="margin: 0; color: white;">👥 Student Overview</h3>
-        <p style="margin: 10px 0 0 0;">View all students with progress summaries and quick navigation</p>
+        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+            {students_icon}
+            <h3 style="margin: 0 0 0 12px; color: white; font-family: 'DM Serif Display', serif;">Student Overview</h3>
+        </div>
+        <p style="margin: 0; font-family: 'Inter', sans-serif;">View all students with progress summaries and quick navigation</p>
     </div>
     """, unsafe_allow_html=True)
 
     if st.button("Go to Student Overview →", key="nav_overview", use_container_width=True):
         st.switch_page("pages/01_Student_Overview.py")
 
-    st.markdown("""
+    trends_icon = render_icon("trending-up", color="white", size=32, inline=False)
+    st.markdown(f"""
     <div style="
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        padding: 25px;
-        border-radius: 15px;
-        margin: 10px 0;
+        background: linear-gradient(135deg, #6b8456 0%, #8ba068 100%);
+        padding: 28px;
+        border-radius: 24px;
+        margin: 12px 0;
         color: white;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        box-shadow: 0 5px 12px rgba(58, 90, 68, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.1);
     ">
-        <h3 style="margin: 0; color: white;">📈 Skill Trends</h3>
-        <p style="margin: 10px 0 0 0;">Interactive charts showing student skill progression over time</p>
+        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+            {trends_icon}
+            <h3 style="margin: 0 0 0 12px; color: white; font-family: 'DM Serif Display', serif;">Skill Trends</h3>
+        </div>
+        <p style="margin: 0; font-family: 'Inter', sans-serif;">Interactive charts showing student skill progression over time</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -150,34 +171,44 @@ with nav_col1:
         st.switch_page("pages/02_Skill_Trends.py")
 
 with nav_col2:
-    st.markdown("""
+    review_icon = render_icon("clipboard-check", color="white", size=32, inline=False)
+    st.markdown(f"""
     <div style="
-        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-        padding: 25px;
-        border-radius: 15px;
-        margin: 10px 0;
+        background: linear-gradient(135deg, #3d8a96 0%, #50a3b0 100%);
+        padding: 28px;
+        border-radius: 24px;
+        margin: 12px 0;
         color: white;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        box-shadow: 0 5px 12px rgba(58, 90, 68, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.1);
     ">
-        <h3 style="margin: 0; color: white;">✅ Assessment Review</h3>
-        <p style="margin: 10px 0 0 0;">Review and correct AI-generated assessments to improve accuracy</p>
+        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+            {review_icon}
+            <h3 style="margin: 0 0 0 12px; color: white; font-family: 'DM Serif Display', serif;">Assessment Review</h3>
+        </div>
+        <p style="margin: 0; font-family: 'Inter', sans-serif;">Review and correct AI-generated assessments to improve accuracy</p>
     </div>
     """, unsafe_allow_html=True)
 
     if st.button("Go to Assessment Review →", key="nav_review", use_container_width=True):
         st.switch_page("pages/03_Assessment_Review.py")
 
-    st.markdown("""
+    target_icon = render_icon("target", color="white", size=32, inline=False)
+    st.markdown(f"""
     <div style="
-        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-        padding: 25px;
-        border-radius: 15px;
-        margin: 10px 0;
+        background: linear-gradient(135deg, #d67e3a 0%, #ef9f32 100%);
+        padding: 28px;
+        border-radius: 24px;
+        margin: 12px 0;
         color: white;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        box-shadow: 0 5px 12px rgba(214, 126, 58, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.1);
     ">
-        <h3 style="margin: 0; color: white;">🎯 Target Assignment</h3>
-        <p style="margin: 10px 0 0 0;">Set skill growth goals and track student progress toward targets</p>
+        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+            {target_icon}
+            <h3 style="margin: 0 0 0 12px; color: white; font-family: 'DM Serif Display', serif;">Target Assignment</h3>
+        </div>
+        <p style="margin: 0; font-family: 'Inter', sans-serif;">Set skill growth goals and track student progress toward targets</p>
     </div>
     """, unsafe_allow_html=True)
 

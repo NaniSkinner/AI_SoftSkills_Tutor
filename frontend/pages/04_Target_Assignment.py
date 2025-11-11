@@ -9,25 +9,36 @@ import sys
 import os
 
 # Add parent directory to path for imports
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+parent_dir = os.path.dirname(os.path.dirname(__file__))
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
 
 from utils.api_client import APIClient
 from utils.session_utils import initialize_session_state, get_teacher
 from utils.badge_utils import format_level_transition, get_badge_color, get_level_emoji
+from utils.icon_utils import render_icon, get_page_icon
 
 # Page configuration
 st.set_page_config(
     page_title="Target Assignment - Flourish Skills Tracker",
-    page_icon="🎯",
+    page_icon="🌿",
     layout="wide"
 )
 
 # Initialize session state
 initialize_session_state()
 
-# Page header
-st.title("🎯 Target Assignment")
-st.markdown("Set skill growth goals for students")
+# Page header with icon
+title_html = f"""
+<div style="display: flex; align-items: center; margin-bottom: 0;">
+    {get_page_icon("targets", color="#3a5a44", size=44)}
+    <h1 style="margin-left: 16px; margin-bottom: 0; color: #2c4733; font-family: 'DM Serif Display', serif;">
+        Target Assignment
+    </h1>
+</div>
+"""
+st.markdown(title_html, unsafe_allow_html=True)
+st.markdown("### Set skill growth goals for students")
 st.markdown("---")
 
 # Student selection
@@ -92,21 +103,25 @@ if active_targets:
     target = active_targets[0]  # Should only be one active target
 
     transition = format_level_transition(target["starting_level"], target["target_level"])
-    target_color = get_badge_color(target["target_level"])
+    target_icon = render_icon("target", color="white", size=32, inline=False)
 
     st.markdown(f"""
     <div style="
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 25px;
-        border-radius: 15px;
+        background: linear-gradient(135deg, #3a5a44 0%, #3d8a96 100%);
+        padding: 28px;
+        border-radius: 24px;
         color: white;
-        margin: 20px 0;
-        box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        margin: 24px 0;
+        box-shadow: 0 6px 16px rgba(58, 90, 68, 0.25);
+        border: 3px solid rgba(255, 255, 255, 0.2);
     ">
-        <h2 style="margin: 0; color: white;">{target['skill_name']}</h2>
-        <h3 style="margin: 10px 0; color: white;">{transition}</h3>
-        <p style="margin: 5px 0;"><strong>Assigned:</strong> {target['assigned_at'][:10]}</p>
-        <p style="margin: 5px 0;"><strong>Assigned by:</strong> {target['assigned_by']}</p>
+        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+            {target_icon}
+            <h2 style="margin: 0 0 0 12px; color: white; font-family: 'DM Serif Display', serif;">{target['skill_name']}</h2>
+        </div>
+        <h3 style="margin: 12px 0; color: white; font-family: 'Inter', sans-serif; font-weight: 700;">{transition}</h3>
+        <p style="margin: 6px 0; font-family: 'Inter', sans-serif;"><strong>Assigned:</strong> {target['assigned_at'][:10]}</p>
+        <p style="margin: 6px 0; font-family: 'Inter', sans-serif;"><strong>Assigned by:</strong> {target['assigned_by']}</p>
     </div>
     """, unsafe_allow_html=True)
 

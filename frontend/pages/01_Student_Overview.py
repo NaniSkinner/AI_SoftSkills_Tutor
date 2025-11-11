@@ -9,23 +9,34 @@ import sys
 import os
 
 # Add parent directory to path for imports
-sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+parent_dir = os.path.dirname(os.path.dirname(__file__))
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
 
 from utils.api_client import APIClient
 from utils.session_utils import initialize_session_state, set_teacher, set_selected_student
+from utils.icon_utils import render_icon, get_page_icon
 
 # Page configuration
 st.set_page_config(
     page_title="Student Overview - Flourish Skills Tracker",
-    page_icon="👥",
+    page_icon="🌿",
     layout="wide"
 )
 
 # Initialize session state
 initialize_session_state()
 
-# Page header
-st.title("👥 Student Overview")
+# Page header with icon
+title_html = f"""
+<div style="display: flex; align-items: center; margin-bottom: 0;">
+    {get_page_icon("students", color="#3a5a44", size=44)}
+    <h1 style="margin-left: 16px; margin-bottom: 0; color: #2c4733; font-family: 'DM Serif Display', serif;">
+        Student Overview
+    </h1>
+</div>
+"""
+st.markdown(title_html, unsafe_allow_html=True)
 st.markdown("---")
 
 # Teacher selection
@@ -147,19 +158,20 @@ try:
                 student = filtered_students[student_idx]
 
                 with col:
-                    # Student card
+                    # Student card with Flourish branding
                     with st.container():
                         st.markdown(f"""
                         <div style="
-                            border: 2px solid #e0e0e0;
-                            border-radius: 10px;
-                            padding: 20px;
+                            border: 2px solid #6b8456;
+                            border-radius: 24px;
+                            padding: 24px;
                             margin-bottom: 20px;
-                            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-                            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                            background: linear-gradient(135deg, #faf7f2 0%, #f0ebe3 100%);
+                            box-shadow: 0 4px 8px rgba(58, 90, 68, 0.12);
+                            transition: all 0.3s ease;
                         ">
-                            <h3 style="margin-top: 0; color: #2c3e50;">{student['name']}</h3>
-                            <p style="color: #7f8c8d; font-size: 14px;">Grade {student.get('grade', 'N/A')}</p>
+                            <h3 style="margin-top: 0; color: #2c4733; font-family: 'DM Serif Display', serif;">{student['name']}</h3>
+                            <p style="color: #5a6b5c; font-size: 14px; font-family: 'Inter', sans-serif; font-weight: 500;">Grade {student.get('grade', 'N/A')}</p>
                         </div>
                         """, unsafe_allow_html=True)
 
@@ -176,25 +188,36 @@ try:
                             with metric_col2:
                                 st.metric("Badges", progress.get("total_badges", 0))
 
-                            # Growth indicator
+                            # Growth indicator with icon
                             recent_growth = progress.get("recent_growth", [])
                             if recent_growth:
-                                growth_indicator = "📈 Growing"
-                                growth_color = "#2ecc71"
+                                growth_icon = render_icon("trending-up", color="#3a5a44", size=20, inline=True)
+                                growth_text = "Growing"
+                                growth_color = "#3a5a44"
                             else:
-                                growth_indicator = "➡️ Stable"
-                                growth_color = "#95a5a6"
+                                growth_icon = render_icon("arrow-right", color="#6b8456", size=20, inline=True)
+                                growth_text = "Stable"
+                                growth_color = "#6b8456"
 
                             st.markdown(f"""
-                            <p style="color: {growth_color}; font-weight: bold; text-align: center;">
-                                {growth_indicator}
-                            </p>
+                            <div style="text-align: center; margin-top: 8px;">
+                                <span style="color: {growth_color}; font-weight: 600; font-family: 'Inter', sans-serif;">
+                                    {growth_icon} {growth_text}
+                                </span>
+                            </div>
                             """, unsafe_allow_html=True)
 
-                            # Active targets
+                            # Active targets with icon
                             active_targets = progress.get("active_targets", 0)
                             if active_targets > 0:
-                                st.info(f"🎯 {active_targets} active target(s)")
+                                target_icon = render_icon("target", color="#d67e3a", size=18, inline=True)
+                                st.markdown(f"""
+                                <div style="background-color: #fef7ed; padding: 10px; border-radius: 12px;
+                                             border-left: 4px solid #d67e3a; margin-top: 8px;
+                                             font-family: 'Inter', sans-serif; font-size: 14px; color: #7a4f1a;">
+                                    {target_icon} {active_targets} active target(s)
+                                </div>
+                                """, unsafe_allow_html=True)
 
                         except Exception as e:
                             st.error(f"Failed to load progress: {str(e)}")
