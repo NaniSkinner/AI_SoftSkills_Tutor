@@ -1,0 +1,126 @@
+{
+  "project": {
+    "name": "Flourish Skills Tracker MVP",
+    "version": "1.0",
+    "rubric_version": "1.0",
+    "data_period": {
+      "start": "2025-08-01",
+      "end": "2025-10-31"
+    }
+  },
+  "teachers": [
+    {
+      "id": "T001",
+      "name": "Ms. Rodriguez",
+      "email": "rodriguez@flourishschools.edu"
+    },
+    {
+      "id": "T002",
+      "name": "Mr. Thompson",
+      "email": "thompson@flourishschools.edu"
+    }
+  ],
+  "students": [
+    {
+      "id": "S001",
+      "name": "Eva",
+      "grade": 7,
+      "teacher_id": "T001",
+      "archetype": "steady_climber",
+      "description": "Consistent growth across all domains. Strong communicator from start. Shows steady improvement in EF skills.",
+      "growth_trajectory": {
+        "month_1": {
+          "strengths": ["Communication (P)", "Social Awareness (P)", "Relationship Skills (P)"],
+          "developing": ["Planning & Prioritization (D)", "Organization (D)", "Self-Awareness (D)", "Self-Management (D)"],
+          "focus_areas": ["Executive Functioning", "Self-regulation"]
+        },
+        "month_2": {
+          "strengths": ["Communication (P)", "Social Awareness (P)", "Relationship Skills (P)", "Planning & Prioritization (P)"],
+          "developing": ["Organization (P)", "Self-Awareness (P)", "Working Memory (D)", "Task Initiation (D)"],
+          "focus_areas": ["Advancing Communication to Advanced", "Strengthening working memory"]
+        },
+        "month_3": {
+          "strengths": ["Communication (A)", "Social Awareness (A)", "Planning & Prioritization (P)", "Organization (P)"],
+          "developing": ["Self-Management (P)", "Working Memory (P)", "Collaboration (P)"],
+          "focus_areas": ["Emerging leadership", "Complex project management"]
+        }
+      }
+    },
+    {
+      "id": "S002",
+      "name": "Lucas",
+      "grade": 7,
+      "teacher_id": "T001",
+      "archetype": "ef_champion",
+      "description": "Exceptionally organized and focused. Advances in EF skills early. Initially struggles with emotional expression and collaboration.",
+      "growth_trajectory": {
+        "month_1": {
+          "strengths": ["Organization (A)", "Inhibitory Control (P)", "Task Initiation (P)", "Planning & Prioritization (P)"],
+          "developing": ["Self-Awareness (D)", "Relationship Skills (D)", "Communication (D)"],
+          "focus_areas": ["Emotional intelligence", "Group collaboration"]
+        },
+        "month_2": {
+          "strengths": ["Organization (A)", "Inhibitory Control (A)", "Task Initiation (P)", "Planning & Prioritization (P)"],
+          "developing": ["Self-Awareness (P)", "Relationship Skills (P)", "Communication (P)", "Cognitive Flexibility (D)"],
+          "focus_areas": ["Adapting to unexpected changes", "Peer mentoring"]
+        },
+        "month_3": {
+          "strengths": ["Organization (A)", "Inhibitory Control (A)", "Planning & Prioritization (A)", "Working Memory (A)"],
+          "developing": ["Collaboration (P)", "Social Awareness (P)", "Cognitive Flexibility (P)"],
+          "focus_areas": ["Advanced collaboration", "Emotional articulation"]
+        }
+      }
+    },
+    {
+      "id": "S003",
+      "name": "Pat",
+      "grade": 7,
+      "teacher_id": "T002",
+      "archetype": "late_bloomer",
+      "description": "Starts at Emerging in most areas but shows dramatic growth when given patient support. Breakthrough moment in Month 2. Strong sense of justice (Montessori sensitive period).",
+      "growth_trajectory": {
+        "month_1": {
+          "strengths": ["Creativity & Innovation (D)", "Global Awareness (D)"],
+          "developing": ["Task Initiation (E)", "Organization (E)", "Self-Management (E)", "Communication (D)"],
+          "focus_areas": ["Building foundational habits", "Executive functioning basics"]
+        },
+        "month_2": {
+          "strengths": ["Creativity & Innovation (P)", "Responsible Decision-Making (P)", "Critical Thinking (P)"],
+          "developing": ["Task Initiation (D)", "Organization (D)", "Self-Management (D)", "Communication (P)"],
+          "focus_areas": ["Rapid skill acceleration", "Leveraging justice-oriented motivation"]
+        },
+        "month_3": {
+          "strengths": ["Critical Thinking (P)", "Responsible Decision-Making (P)", "Creativity & Innovation (P)", "Communication (P)"],
+          "developing": ["Organization (P)", "Task Initiation (P)", "Collaboration (P)"],
+          "focus_areas": ["Sustaining progress", "Leadership through advocacy"]
+        }
+      }
+    },
+    {
+      "id": "S004",
+      "name": "Mia",
+      "grade": 7,
+      "teacher_id": "T002",
+      "archetype": "leader",
+      "description": "Natural leader with Advanced-level collaboration and social awareness from the start. Occasionally struggles with cognitive flexibility when plans change unexpectedly.",
+      "growth_trajectory": {
+        "month_1": {
+          "strengths": ["Collaboration (A)", "Social Awareness (A)", "Relationship Skills (A)", "Communication (P)"],
+          "developing": ["Cognitive Flexibility (D)", "Self-Management (P)", "Inhibitory Control (P)"],
+          "focus_areas": ["Adapting to change", "Managing perfectionism"]
+        },
+        "month_2": {
+          "strengths": ["Collaboration (A)", "Social Awareness (A)", "Relationship Skills (A)", "Communication (A)", "Leadership emerging"],
+          "developing": ["Cognitive Flexibility (P)", "Critical Thinking (P)", "Digital Literacy (P)"],
+          "focus_areas": ["Developing systems thinking", "Mentoring peers"]
+        },
+        "month_3": {
+          "strengths": ["Collaboration (A)", "Social Awareness (A)", "Communication (A)", "Cognitive Flexibility (P)", "Responsible Decision-Making (A)"],
+          "developing": ["Critical Thinking (A)", "Global Awareness (P)"],
+          "focus_areas": ["Advanced leadership", "Complex ethical reasoning"]
+        }
+      }
+    }
+  ],
+  "data_entries": []
+}

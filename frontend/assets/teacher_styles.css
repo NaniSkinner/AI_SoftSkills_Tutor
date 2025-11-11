@@ -1,0 +1,345 @@
+/* Flourish Skills Tracker - Teacher Dashboard Styles */
+
+/* Student Cards */
+.student-card {
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.student-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Badge Display */
+.badge-container {
+    display: inline-block;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    margin: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    font-family: 'Segoe UI', sans-serif;
+    text-align: center;
+    min-width: 150px;
+}
+
+.badge-locked {
+    opacity: 0.3;
+    filter: grayscale(70%);
+}
+
+.badge-earned {
+    opacity: 1.0;
+}
+
+/* Level Colors */
+.level-emerging {
+    background-color: #E0E0E0;
+    color: #333;
+}
+
+.level-developing {
+    background: linear-gradient(135deg, #CD7F32, #b87333);
+    color: white;
+}
+
+.level-proficient {
+    background: linear-gradient(135deg, #C0C0C0, #a8a8a8);
+    color: #333;
+}
+
+.level-advanced {
+    background: linear-gradient(135deg, #FFD700, #ffa500);
+    color: #333;
+}
+
+/* Progress Indicators */
+.progress-bar {
+    height: 8px;
+    border-radius: 4px;
+    background-color: #e0e0e0;
+    overflow: hidden;
+    margin: 10px 0;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.progress-emerging {
+    background-color: #ff6b6b;
+}
+
+.progress-developing {
+    background-color: #ffd43b;
+}
+
+.progress-proficient {
+    background-color: #51cf66;
+}
+
+.progress-advanced {
+    background-color: #339af0;
+}
+
+/* Assessment Cards */
+.assessment-card {
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 15px 0;
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.assessment-card-low-confidence {
+    border-left: 4px solid #e74c3c;
+}
+
+.assessment-card-high-confidence {
+    border-left: 4px solid #2ecc71;
+}
+
+/* Navigation Cards */
+.nav-card {
+    padding: 25px;
+    border-radius: 15px;
+    margin: 10px 0;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.nav-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.nav-card-purple {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.nav-card-pink {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.nav-card-blue {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.nav-card-green {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+/* Target Display */
+.target-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 25px;
+    border-radius: 15px;
+    color: white;
+    margin: 20px 0;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.target-transition {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+/* Buttons */
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-primary:hover {
+    transform: scale(1.05);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Metric Cards */
+.metric-card {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid #dee2e6;
+}
+
+.metric-value {
+    font-size: 32px;
+    font-weight: bold;
+    color: #667eea;
+    margin: 10px 0;
+}
+
+.metric-label {
+    font-size: 14px;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Tables */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+.data-table th {
+    background-color: #667eea;
+    color: white;
+    padding: 12px;
+    text-align: left;
+}
+
+.data-table td {
+    padding: 12px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.data-table tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Skill Timeline */
+.skill-timeline {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.skill-timeline-item {
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin: 0 5px;
+    font-weight: bold;
+    transition: transform 0.2s;
+}
+
+.skill-timeline-item:hover {
+    transform: scale(1.1);
+}
+
+/* Icons */
+.icon-trophy {
+    color: #FFD700;
+    font-size: 24px;
+}
+
+.icon-target {
+    color: #667eea;
+    font-size: 24px;
+}
+
+.icon-chart {
+    color: #4facfe;
+    font-size: 24px;
+}
+
+.icon-check {
+    color: #2ecc71;
+    font-size: 24px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .student-card {
+        margin-bottom: 15px;
+    }
+
+    .nav-card {
+        margin-bottom: 15px;
+    }
+
+    .metric-card {
+        margin-bottom: 10px;
+    }
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Alerts */
+.alert-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+    padding: 12px 20px;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    color: #856404;
+    padding: 12px 20px;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+    padding: 12px 20px;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+.alert-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+    padding: 12px 20px;
+    border-radius: 5px;
+    margin: 10px 0;
+}
