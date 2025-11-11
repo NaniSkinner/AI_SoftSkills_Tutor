@@ -194,29 +194,26 @@ try:
 
             # Step 2: Choose avatar
             st.markdown("---")
-            st.markdown(f"### 🎨 Awesome, {student['name']}! Now pick your character:")
+            st.markdown(f"### 🎨 Awesome, {student['name']}! Pick your avatar:")
 
             # Avatar styles using DiceBear API
+            # Fixed avatars (same for all students, no descriptive names)
             avatar_styles = [
                 {
-                    "name": "Adventurer",
-                    "url": f"https://api.dicebear.com/7.x/adventurer/svg?seed={student['name']}&backgroundColor=7FA99B",
-                    "desc": "Brave Explorer"
+                    "name": "Avatar1",
+                    "url": "https://api.dicebear.com/7.x/bottts/svg?seed=Ryan&backgroundColor=757575"
                 },
                 {
-                    "name": "Avataaars",
-                    "url": f"https://api.dicebear.com/7.x/avataaars/svg?seed={student['name']}&backgroundColor=E8C5A5",
-                    "desc": "Cool Kid"
+                    "name": "Avatar2",
+                    "url": "https://api.dicebear.com/7.x/adventurer/svg?seed=Kingston&backgroundColor=7FA99B"
                 },
                 {
-                    "name": "Bottts",
-                    "url": f"https://api.dicebear.com/7.x/bottts/svg?seed={student['name']}&backgroundColor=A0937D",
-                    "desc": "Friendly Robot"
+                    "name": "Avatar3",
+                    "url": "https://api.dicebear.com/7.x/adventurer/svg?seed=Liam&backgroundColor=E8C5A5"
                 },
                 {
-                    "name": "Lorelei",
-                    "url": f"https://api.dicebear.com/7.x/lorelei/svg?seed={student['name']}&backgroundColor=C9B8A8",
-                    "desc": "Happy Face"
+                    "name": "Avatar4",
+                    "url": "https://api.dicebear.com/7.x/adventurer/svg?seed=Avery&backgroundColor=C9B8A8"
                 }
             ]
 
@@ -229,11 +226,10 @@ try:
                     is_selected = st.session_state.selected_avatar == avatar['name']
                     card_class = "avatar-card selected" if is_selected else "avatar-card"
 
-                    # Avatar card
+                    # Avatar card (no name/description displayed)
                     st.markdown(f"""
                     <div class="{card_class}" onclick="document.getElementById('avatar_{idx}').click()">
-                        <img src="{avatar['url']}" class="avatar-img" alt="{avatar['name']}">
-                        <div class="avatar-name">{avatar['desc']}</div>
+                        <img src="{avatar['url']}" class="avatar-img" alt="Avatar {idx + 1}">
                     </div>
                     """, unsafe_allow_html=True)
 
@@ -247,9 +243,9 @@ try:
             if st.session_state.selected_avatar:
                 st.markdown("---")
 
-                st.markdown(f"""
+                st.markdown("""
                 <div class="info-box">
-                    <strong>You picked: {next(a['desc'] for a in avatar_styles if a['name'] == st.session_state.selected_avatar)}</strong>
+                    <strong>Avatar selected!</strong>
                     <br>
                     Ready to see how you're growing? 🌱
                 </div>
