@@ -21,6 +21,7 @@ from utils.session_utils import (
 )
 from utils.badge_utils import get_badge_color, get_level_emoji
 from utils.icon_utils import render_icon, get_page_icon
+from utils.rubric_utils import render_rubric_html
 
 # Page configuration
 st.set_page_config(
@@ -275,6 +276,41 @@ st.markdown(current_assessment['justification'])
 if current_assessment.get('source_quote'):
     with st.expander("📝 View Source Quote"):
         st.markdown(current_assessment['source_quote'])
+
+# Rubric Reference
+with st.expander("📋 View Skill Level Descriptions", expanded=False):
+    st.info("**What does each level mean?** Read the descriptions below to understand what students at each level can typically do.")
+
+    # Get rubric data
+    from utils.rubric_utils import get_skill_rubric
+    rubric = get_skill_rubric(current_assessment['skill_name'])
+
+    if rubric:
+        st.markdown(f"**Skill:** {current_assessment['skill_name']}")
+        st.markdown(f"**Category:** {rubric['category']}")
+        st.markdown("---")
+
+        # Display each level
+        level_emojis = {
+            "Emerging": "🌱",
+            "Developing": "🥉",
+            "Proficient": "🥈",
+            "Advanced": "🥇"
+        }
+
+        for level in ["Emerging", "Developing", "Proficient", "Advanced"]:
+            is_current = (level == full_level_name)
+
+            if is_current:
+                st.success(f"**{level_emojis[level]} {level} ← AI's Current Assessment**")
+                st.markdown(rubric[level])
+            else:
+                st.markdown(f"**{level_emojis[level]} {level}**")
+                st.markdown(rubric[level])
+
+            st.markdown("")  # Add spacing
+
+        st.info("💡 **Tip:** Compare the AI's assessment with what you observed to decide if you need to make a correction.")
 
 st.markdown("---")
 
