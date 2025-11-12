@@ -314,3 +314,14 @@ except Exception as e:
 
     if st.button("🔄 Retry"):
         st.rerun()
+
+# Footer
+st.markdown("---")
+st.markdown(
+    """
+    <div style='text-align: center; color: #999; padding: 10px; font-size: 0.85em;'>
+        Made with 🍵 by <strong>Nani Skinner</strong>
+    </div>
+    """,
+    unsafe_allow_html=True
+)

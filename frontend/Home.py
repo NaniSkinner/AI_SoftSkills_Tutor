@@ -291,6 +291,9 @@ st.markdown(
     <div style='text-align: center; color: gray; padding: 20px;'>
         Flourish Skills Tracker v1.0.0 | Teacher Dashboard | Powered by GPT-4o via OpenRouter
     </div>
+    <div style='text-align: center; color: #999; padding: 10px; font-size: 0.85em;'>
+        Made with 🍵 by <strong>Nani Skinner</strong>
+    </div>
     """,
     unsafe_allow_html=True
 )

@@ -474,3 +474,14 @@ except Exception as e:
     st.error(f"Oops! We couldn't load your journey: {str(e)}")
     if st.button("← Try Again"):
         st.switch_page("pages/Student_00_Home.py")
+
+# Footer
+st.markdown("---")
+st.markdown(
+    """
+    <div style='text-align: center; color: #999; padding: 10px; font-size: 0.85em;'>
+        Made with 🍵 by <strong>Nani Skinner</strong>
+    </div>
+    """,
+    unsafe_allow_html=True
+)

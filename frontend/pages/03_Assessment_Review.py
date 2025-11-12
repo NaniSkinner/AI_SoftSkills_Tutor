@@ -435,3 +435,14 @@ with nav_col3:
     if st.button("Next →", disabled=(progress["current_index"] >= len(assessments) - 1)):
         advance_review_index()
         st.rerun()
+
+# Footer
+st.markdown("---")
+st.markdown(
+    """
+    <div style='text-align: center; color: #999; padding: 10px; font-size: 0.85em;'>
+        Made with 🍵 by <strong>Nani Skinner</strong>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
