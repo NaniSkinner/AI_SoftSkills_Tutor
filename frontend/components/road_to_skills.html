@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Road to Skills Journey Map</title>
+
+    <!-- React and ReactDOM from CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+    <!-- Framer Motion from CDN -->
+    <script src="https://unpkg.com/framer-motion@11/dist/framer-motion.js"></script>
+
+    <!-- Babel Standalone for JSX transformation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Architects+Daughter&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Patrick Hand', cursive;
+            background: linear-gradient(135deg, #FFF8E7 0%, #F5E6D3 100%);
+            overflow-x: hidden;
+        }
+
+        #root {
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Container */
+        .journey-container {
+            width: 100%;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Header */
+        .journey-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .journey-title {
+            font-family: 'Architects Daughter', cursive;
+            font-size: 2.5rem;
+            color: #5D4E37;
+            text-shadow: 3px 3px 0px #E8C5A5;
+            margin-bottom: 10px;
+        }
+
+        .journey-subtitle {
+            font-size: 1.2rem;
+            color: #7FA99B;
+        }
+
+        /* View Toggle */
+        .view-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .toggle-btn {
+            background: white;
+            border: 3px solid #8B7355;
+            border-radius: 15px;
+            padding: 12px 24px;
+            font-family: 'Patrick Hand', cursive;
+            font-size: 1.1rem;
+            color: #5D4E37;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 4px 4px 0px #A0937D;
+        }
+
+        .toggle-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 6px 6px 0px #7FA99B;
+        }
+
+        .toggle-btn.active {
+            background: linear-gradient(135deg, #7FA99B 0%, #5D8B7F 100%);
+            color: white;
+            border-color: #5D4E37;
+        }
+
+        /* Goal Banner */
+        .goal-banner {
+            background: linear-gradient(135deg, #FFE57F 0%, #FFD54F 100%);
+            border: 3px solid #F57C00;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 6px 6px 0px #FFCA28;
+        }
+
+        .goal-banner-text {
+            font-size: 1.3rem;
+            color: #E65100;
+            font-weight: bold;
+        }
+
+        .goal-progression {
+            font-size: 1.5rem;
+            margin-top: 10px;
+            color: #F57F17;
+        }
+
+        /* SVG Canvas */
+        .svg-canvas {
+            width: 100%;
+            min-height: 600px;
+            position: relative;
+            overflow: visible;
+        }
+
+        /* Skill Card */
+        .skill-card {
+            background: white;
+            border: 3px solid #8B7355;
+            border-radius: 20px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 6px 6px 0px #A0937D;
+            position: absolute;
+            min-width: 200px;
+            max-width: 250px;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 8px 8px 0px #7FA99B;
+            z-index: 100;
+        }
+
+        .skill-card.locked {
+            opacity: 0.5;
+            filter: grayscale(70%);
+        }
+
+        .skill-card.current {
+            border-color: #FFA000;
+            box-shadow: 0 0 20px #FFA726, 6px 6px 0px #FFCA28;
+            animation: glow-pulse 2s infinite;
+        }
+
+        .skill-card.achieved {
+            border-color: #66BB6A;
+            background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% { box-shadow: 0 0 20px #FFA726, 6px 6px 0px #FFCA28; }
+            50% { box-shadow: 0 0 30px #FF6F00, 8px 8px 0px #FFB74D; }
+        }
+
+        .skill-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .skill-icon {
+            font-size: 2.5rem;
+        }
+
+        .skill-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #5D4E37;
+            flex: 1;
+        }
+
+        .level-indicator {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .level-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #E0E0E0;
+            border: 2px solid #9E9E9E;
+        }
+
+        .level-dot.completed {
+            background: #66BB6A;
+            border-color: #388E3C;
+        }
+
+        .level-dot.current {
+            background: #FFA726;
+            border-color: #F57C00;
+            animation: pulse-dot 1.5s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        /* Expanded Tips */
+        .skill-tips {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px dashed #A0937D;
+        }
+
+        .tips-title {
+            font-size: 1rem;
+            color: #F57F17;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .tip-item {
+            background: #FFF9C4;
+            border: 2px solid #FBC02D;
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin: 8px 0;
+            font-size: 0.95rem;
+            color: #5D4037;
+            display: flex;
+            gap: 8px;
+            align-items: start;
+        }
+
+        .tip-bullet {
+            font-weight: bold;
+            color: #F57F17;
+            flex-shrink: 0;
+        }
+
+        /* Avatar */
+        .student-avatar {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid #7FA99B;
+            box-shadow: 0 0 15px rgba(127, 169, 155, 0.5);
+            animation: avatar-float 3s ease-in-out infinite;
+            z-index: 200;
+        }
+
+        @keyframes avatar-float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Path Lines */
+        .path-line {
+            stroke-width: 4;
+            stroke-linecap: round;
+            fill: none;
+            opacity: 0.7;
+        }
+
+        .path-line.active {
+            stroke-width: 6;
+            opacity: 1;
+            filter: drop-shadow(0 0 8px currentColor);
+        }
+
+        /* Legend */
+        .legend {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: white;
+            border: 3px solid #8B7355;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 6px 6px 0px #A0937D;
+            z-index: 300;
+        }
+
+        .legend-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #5D4E37;
+            margin-bottom: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            font-size: 0.95rem;
+            color: #5D4E37;
+        }
+
+        .legend-icon {
+            font-size: 1.5rem;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            gap: 20px;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #E0E0E0;
+            border-top: 5px solid #7FA99B;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.3rem;
+            color: #7FA99B;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .journey-title {
+                font-size: 2rem;
+            }
+
+            .skill-card {
+                min-width: 160px;
+                max-width: 180px;
+                padding: 12px;
+            }
+
+            .skill-name {
+                font-size: 1rem;
+            }
+
+            .legend {
+                bottom: 10px;
+                right: 10px;
+                padding: 10px;
+                font-size: 0.85rem;
+            }
+
+            .toggle-btn {
+                padding: 10px 18px;
+                font-size: 1rem;
+            }
+        }
+
+        /* Celebration Animation */
+        @keyframes celebrate {
+            0% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(-5deg); }
+            50% { transform: scale(1.1) rotate(5deg); }
+            75% { transform: scale(1.2) rotate(-3deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        .celebrating {
+            animation: celebrate 0.6s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+        const { motion, AnimatePresence } = window.FramerMotion;
+
+        // Skill Tips Data (embedded for self-containment)
+        const SKILL_TIPS = %SKILL_TIPS_DATA%;
+
+        // Visual Configuration
+        const VISUALS = %VISUAL_CONFIG_DATA%;
+
+        // Path generation helper - creates curved SVG path
+        const generatePath = (points) => {
+            if (points.length < 2) return '';
+
+            let path = `M ${points[0].x} ${points[0].y}`;
+            for (let i = 1; i < points.length; i++) {
+                const prev = points[i - 1];
+                const curr = points[i];
+                const cpx = prev.x + (curr.x - prev.x) / 2;
+                const cpy = prev.y + (curr.y - prev.y) / 2;
+                path += ` Q ${cpx} ${cpy} ${curr.x} ${curr.y}`;
+            }
+            return path;
+        };
+
+        // Skill Card Component
+        const SkillCard = ({ skill, position, isExpanded, onToggle, viewMode }) => {
+            const levelIcons = ['🌱', '🥉', '🥈', '🥇'];
+            const levelNames = ['Emerging', 'Developing', 'Proficient', 'Advanced'];
+
+            const currentLevelIndex = skill.currentLevel ? levelNames.indexOf(skill.currentLevel) : 0;
+            const isLocked = skill.status === 'locked';
+            const isCurrent = skill.status === 'in-progress';
+            const isAchieved = skill.status === 'achieved';
+
+            const tips = SKILL_TIPS[skill.name]?.[skill.currentLevel] || [
+                'Keep practicing this skill every day!',
+                'Ask your teacher for feedback',
+                'Notice when you use this skill successfully'
+            ];
+
+            return (
+                <motion.div
+                    className={`skill-card ${isLocked ? 'locked' : ''} ${isCurrent ? 'current' : ''} ${isAchieved ? 'achieved' : ''}`}
+                    style={{
+                        left: `${position.x}px`,
+                        top: `${position.y}px`,
+                    }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    whileHover={{ scale: 1.05 }}
+                    onClick={() => !isLocked && onToggle()}
+                    layout
+                >
+                    <div className="skill-card-header">
+                        <span className="skill-icon">{levelIcons[currentLevelIndex]}</span>
+                        <span className="skill-name">{skill.name}</span>
+                        {isLocked && <span>🔒</span>}
+                        {isAchieved && <span>✅</span>}
+                    </div>
+
+                    {viewMode === 'overview' && (
+                        <div className="level-indicator">
+                            {levelNames.map((_, idx) => (
+                                <div
+                                    key={idx}
+                                    className={`level-dot ${
+                                        idx < currentLevelIndex ? 'completed' :
+                                        idx === currentLevelIndex ? 'current' : ''
+                                    }`}
+                                />
+                            ))}
+                        </div>
+                    )}
+
+                    <AnimatePresence>
+                        {isExpanded && !isLocked && (
+                            <motion.div
+                                className="skill-tips"
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: 'auto' }}
+                                exit={{ opacity: 0, height: 0 }}
+                            >
+                                <div className="tips-title">💡 Tips to grow:</div>
+                                {tips.map((tip, idx) => (
+                                    <div key={idx} className="tip-item">
+                                        <span className="tip-bullet">{idx + 1}.</span>
+                                        <span>{tip}</span>
+                                    </div>
+                                ))}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </motion.div>
+            );
+        };
+
+        // Main Road to Skills Component
+        const RoadToSkillsMap = ({ studentData, currentGoal, avatarUrl }) => {
+            const [viewMode, setViewMode] = useState('overview');
+            const [focusedSkill, setFocusedSkill] = useState(null);
+            const [expandedCard, setExpandedCard] = useState(null);
+            const [skills, setSkills] = useState([]);
+            const canvasRef = useRef(null);
+
+            useEffect(() => {
+                // Transform API data into component format
+                if (studentData && Array.isArray(studentData)) {
+                    const transformedSkills = studentData.map(skill => {
+                        const latestAssessment = skill.assessments?.[skill.assessments.length - 1];
+                        const currentLevel = latestAssessment?.level || 'Emerging';
+                        const levelMap = { 'E': 'Emerging', 'D': 'Developing', 'P': 'Proficient', 'A': 'Advanced' };
+
+                        return {
+                            name: skill.skill_name,
+                            category: skill.skill_category,
+                            currentLevel: levelMap[currentLevel] || currentLevel,
+                            status: latestAssessment ? 'in-progress' : 'locked',
+                            assessments: skill.assessments || []
+                        };
+                    });
+                    setSkills(transformedSkills);
+                }
+
+                // Auto-focus on current goal
+                if (currentGoal && currentGoal.skill_name) {
+                    setFocusedSkill(currentGoal.skill_name);
+                    setViewMode('focused');
+                }
+            }, [studentData, currentGoal]);
+
+            // Calculate positions for skill cards
+            const calculatePositions = () => {
+                const positions = {};
+                const canvasWidth = 1200;
+                const canvasHeight = 800;
+
+                if (viewMode === 'overview') {
+                    // Group skills by category and position along paths
+                    const categories = { 'SEL': [], 'EF': [], '21st Century': [] };
+                    skills.forEach(skill => {
+                        const cat = VISUALS.skill_categories[skill.name];
+                        if (cat && categories[cat]) {
+                            categories[cat].push(skill);
+                        }
+                    });
+
+                    let pathIndex = 0;
+                    Object.keys(categories).forEach(cat => {
+                        const categorySkills = categories[cat];
+                        const pathY = 150 + (pathIndex * 220);
+
+                        categorySkills.forEach((skill, idx) => {
+                            const x = 100 + (idx * 220);
+                            const y = pathY + Math.sin(idx * 0.8) * 50;
+                            positions[skill.name] = { x, y };
+                        });
+                        pathIndex++;
+                    });
+                } else if (viewMode === 'focused' && focusedSkill) {
+                    // Single skill - show E→D→P→A progression
+                    const levelNames = ['Emerging', 'Developing', 'Proficient', 'Advanced'];
+                    const skill = skills.find(s => s.name === focusedSkill);
+
+                    if (skill) {
+                        levelNames.forEach((level, idx) => {
+                            const x = 150 + (idx * 280);
+                            const y = 300 + Math.sin(idx * 1.2) * 40;
+                            positions[`${skill.name}-${level}`] = { x, y };
+                        });
+                    }
+                }
+
+                return positions;
+            };
+
+            const positions = calculatePositions();
+
+            return (
+                <div className="journey-container">
+                    <div className="journey-header">
+                        <h1 className="journey-title">🗺️ Your Road to Skills</h1>
+                        <p className="journey-subtitle">Every step forward is progress!</p>
+                    </div>
+
+                    {currentGoal && currentGoal.skill_name && (
+                        <div className="goal-banner">
+                            <div className="goal-banner-text">
+                                🎯 Your current goal: {currentGoal.skill_name}
+                            </div>
+                            <div className="goal-progression">
+                                {currentGoal.starting_level} → {currentGoal.target_level}
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="view-toggle">
+                        <button
+                            className={`toggle-btn ${viewMode === 'overview' ? 'active' : ''}`}
+                            onClick={() => {
+                                setViewMode('overview');
+                                setFocusedSkill(null);
+                            }}
+                        >
+                            🌈 All My Skills
+                        </button>
+                        {focusedSkill && (
+                            <button
+                                className={`toggle-btn ${viewMode === 'focused' ? 'active' : ''}`}
+                                onClick={() => setViewMode('focused')}
+                            >
+                                🎯 {focusedSkill} Journey
+                            </button>
+                        )}
+                    </div>
+
+                    <div className="svg-canvas" ref={canvasRef} style={{ position: 'relative', minHeight: '700px' }}>
+                        {skills.length === 0 ? (
+                            <div className="loading">
+                                <div className="loading-spinner"></div>
+                                <div className="loading-text">Loading your journey...</div>
+                            </div>
+                        ) : viewMode === 'overview' ? (
+                            <>
+                                {skills.map(skill => {
+                                    const position = positions[skill.name];
+                                    return position ? (
+                                        <SkillCard
+                                            key={skill.name}
+                                            skill={skill}
+                                            position={position}
+                                            isExpanded={expandedCard === skill.name}
+                                            onToggle={() => {
+                                                setExpandedCard(expandedCard === skill.name ? null : skill.name);
+                                                setFocusedSkill(skill.name);
+                                            }}
+                                            viewMode={viewMode}
+                                        />
+                                    ) : null;
+                                })}
+                            </>
+                        ) : (
+                            <>
+                                {/* Focused mode - show skill progression */}
+                                {focusedSkill && (() => {
+                                    const skill = skills.find(s => s.name === focusedSkill);
+                                    const levelNames = ['Emerging', 'Developing', 'Proficient', 'Advanced'];
+                                    const currentLevelIndex = skill ? levelNames.indexOf(skill.currentLevel) : 0;
+
+                                    return levelNames.map((level, idx) => {
+                                        const position = positions[`${focusedSkill}-${level}`];
+                                        const cardSkill = {
+                                            name: `${level}`,
+                                            currentLevel: level,
+                                            status: idx < currentLevelIndex ? 'achieved' :
+                                                   idx === currentLevelIndex ? 'in-progress' : 'locked'
+                                        };
+
+                                        return position ? (
+                                            <SkillCard
+                                                key={level}
+                                                skill={cardSkill}
+                                                position={position}
+                                                isExpanded={expandedCard === level}
+                                                onToggle={() => setExpandedCard(expandedCard === level ? null : level)}
+                                                viewMode={viewMode}
+                                            />
+                                        ) : null;
+                                    });
+                                })()}
+                            </>
+                        )}
+
+                        {avatarUrl && viewMode === 'overview' && skills.length > 0 && (
+                            <img
+                                src={avatarUrl}
+                                alt="Your avatar"
+                                className="student-avatar"
+                                style={{
+                                    left: '50px',
+                                    top: '150px'
+                                }}
+                            />
+                        )}
+                    </div>
+
+                    <div className="legend">
+                        <div className="legend-title">Legend</div>
+                        <div className="legend-item">
+                            <span className="legend-icon">🌱</span>
+                            <span>Emerging</span>
+                        </div>
+                        <div className="legend-item">
+                            <span className="legend-icon">🥉</span>
+                            <span>Developing</span>
+                        </div>
+                        <div className="legend-item">
+                            <span className="legend-icon">🥈</span>
+                            <span>Proficient</span>
+                        </div>
+                        <div className="legend-item">
+                            <span className="legend-icon">🥇</span>
+                            <span>Advanced</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // App Entry Point
+        const App = () => {
+            // Data will be injected by Streamlit
+            const studentData = window.STUDENT_DATA || [];
+            const currentGoal = window.CURRENT_GOAL || null;
+            const avatarUrl = window.AVATAR_URL || '';
+
+            return (
+                <RoadToSkillsMap
+                    studentData={studentData}
+                    currentGoal={currentGoal}
+                    avatarUrl={avatarUrl}
+                />
+            );
+        };
+
+        // Render
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

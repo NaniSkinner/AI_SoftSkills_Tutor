@@ -1,0 +1,57 @@
+{
+  "checks": [
+    {
+      "name": "Data entry count",
+      "status": "PASS",
+      "details": "32/32"
+    },
+    {
+      "name": "Assessment count",
+      "status": "PASS",
+      "details": "31 assessments"
+    },
+    {
+      "name": "Student coverage",
+      "status": "PASS",
+      "details": "All students assessed"
+    },
+    {
+      "name": "Skill coverage",
+      "status": "PASS",
+      "details": "8 skills"
+    },
+    {
+      "name": "Confidence scores",
+      "status": "PASS",
+      "details": "Avg: 0.73"
+    },
+    {
+      "name": "Level distribution",
+      "status": "PASS",
+      "details": "4 levels"
+    },
+    {
+      "name": "Data quality",
+      "status": "PASS",
+      "details": "All fields populated"
+    },
+    {
+      "name": "Corrections table",
+      "status": "PASS",
+      "details": "0 corrections"
+    },
+    {
+      "name": "Targets table",
+      "status": "PASS",
+      "details": "1 targets"
+    },
+    {
+      "name": "Badges table",
+      "status": "PASS",
+      "details": "0 badges"
+    }
+  ],
+  "passed": 10,
+  "failed": 0,
+  "warnings": 0
+}

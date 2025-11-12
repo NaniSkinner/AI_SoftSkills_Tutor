@@ -1,0 +1,376 @@
+{
+  "Self-Awareness": {
+    "Emerging": [
+      "Try naming your feelings when they happen - happy, sad, mad, or worried",
+      "Ask a trusted adult to help you understand why you feel a certain way",
+      "Start noticing: What makes you happy? What makes you upset?"
+    ],
+    "Developing": [
+      "Keep a feelings journal - write down how you feel each day and why",
+      "Name specific emotions like frustrated, anxious, or excited (not just happy/sad)",
+      "Think about one thing you're good at and one thing you want to improve"
+    ],
+    "Proficient": [
+      "Notice how your emotions affect your actions - do you work better when calm?",
+      "Describe your learning style: Do you learn best by doing, seeing, or hearing?",
+      "Recognize patterns: What situations make you feel your best?"
+    ],
+    "Advanced": [
+      "Reflect on WHY you want to achieve certain goals - what motivates you?",
+      "Use your self-knowledge to pick challenges that help you grow",
+      "Practice metacognition: Think about how you think and learn"
+    ]
+  },
+  "Self-Management": {
+    "Emerging": [
+      "Take 3 deep breaths when you feel upset before reacting",
+      "Ask an adult to remind you to stay focused on your work",
+      "Try again even when something feels hard - don't give up right away"
+    ],
+    "Developing": [
+      "Use simple calming strategies: count to 10, take a walk, or squeeze a stress ball",
+      "Break big tasks into smaller pieces and tackle one piece at a time",
+      "Set a timer to help you stay on task for short periods (like 10 minutes)"
+    ],
+    "Proficient": [
+      "Create your own toolbox of strategies: deep breathing, exercise, music, or journaling",
+      "Set short-term goals (like finishing homework before dinner) and track your progress",
+      "Keep trying even when tasks are challenging - persistence pays off!"
+    ],
+    "Advanced": [
+      "Notice when you're stressed and choose the best coping strategy for that situation",
+      "Set long-term goals (like improving a grade over the semester) and check progress weekly",
+      "Adapt your strategies based on what works - be your own scientist!"
+    ]
+  },
+  "Social Awareness": {
+    "Emerging": [
+      "Look at people's faces to see if they seem happy, sad, or angry",
+      "Ask yourself: How would I feel if someone did that to me?",
+      "Learn basic classroom rules: raise your hand, take turns, be kind"
+    ],
+    "Developing": [
+      "Pay attention to body language - crossed arms might mean someone is upset",
+      "Try to see things from another person's point of view",
+      "Notice when someone needs help and offer to assist them"
+    ],
+    "Proficient": [
+      "Read subtle cues like tone of voice or facial expressions to understand feelings",
+      "Show empathy by saying things like 'That must be hard for you'",
+      "Respect that people from different backgrounds may have different customs"
+    ],
+    "Advanced": [
+      "Actively seek to understand perspectives very different from your own",
+      "Stand up for others when you see unfairness or exclusion",
+      "Use your understanding of others to bring people together and build community"
+    ]
+  },
+  "Relationship Skills": {
+    "Emerging": [
+      "Practice sharing and taking turns with others",
+      "Wait for your turn to speak instead of interrupting",
+      "Use your words to ask for help: 'Can you please help me with this?'"
+    ],
+    "Developing": [
+      "Participate in group work by doing your part",
+      "Tell others what you need: 'I feel frustrated when...'",
+      "When there's a small conflict, ask an adult to help you work it out"
+    ],
+    "Proficient": [
+      "Communicate clearly and respectfully - say what you mean kindly",
+      "Listen actively: look at the speaker, nod, and ask questions",
+      "Compromise with peers - find solutions that work for everyone"
+    ],
+    "Advanced": [
+      "Build strong friendships across different groups - include everyone",
+      "Help your friends communicate better when they have conflicts",
+      "Lead team projects by making sure everyone's voice is heard"
+    ]
+  },
+  "Responsible Decision-Making": {
+    "Emerging": [
+      "Stop and think before you act - count to 5 first",
+      "Ask yourself: Is this safe? Is this kind?",
+      "Follow safety rules even when no one is watching"
+    ],
+    "Developing": [
+      "List the good and bad things that might happen before making a choice",
+      "Make safe choices in familiar situations (like at school or home)",
+      "Think about how your choice affects others, not just yourself"
+    ],
+    "Proficient": [
+      "Use a decision-making process: What are my options? What could happen? What's best?",
+      "Consider ethics: Is this fair? Is it honest? Does it help or hurt others?",
+      "Make choices that keep you and others safe and happy"
+    ],
+    "Advanced": [
+      "Think about long-term consequences - how will this affect me next week? Next year?",
+      "Consider unintended outcomes - what else might happen that I didn't plan for?",
+      "Make decisions that benefit your whole community, not just yourself"
+    ]
+  },
+  "Working Memory": {
+    "Emerging": [
+      "Ask adults to repeat directions if you forget",
+      "Focus on one step at a time when following instructions",
+      "Write things down or draw pictures to help you remember"
+    ],
+    "Developing": [
+      "Follow 3-4 step directions by repeating them to yourself",
+      "Ask yourself: What am I supposed to be doing right now?",
+      "Connect new information to things you already know"
+    ],
+    "Proficient": [
+      "Follow complex, multi-step instructions without needing reminders",
+      "Hold information in your mind while using it (like solving a long math problem)",
+      "Take good notes to help you remember and use information later"
+    ],
+    "Advanced": [
+      "Combine information from different sources to form new ideas",
+      "Manage multiple tasks in your head at once without getting confused",
+      "Create systems (like mnemonics or diagrams) to remember complex information"
+    ]
+  },
+  "Inhibitory Control": {
+    "Emerging": [
+      "Notice when you're distracted and try to refocus on your work",
+      "Practice pausing for 3 seconds before blurting out answers",
+      "Ask for help if you can't stop a behavior that's not working"
+    ],
+    "Developing": [
+      "Use tools to block distractions: put away your phone, close extra tabs",
+      "Think before speaking - mentally count to 3 before answering",
+      "Start and stop tasks when asked (even if you're not finished yet)"
+    ],
+    "Proficient": [
+      "Work effectively even when there's moderate noise or activity around you",
+      "Always think before speaking or acting - make it a habit",
+      "Delay fun activities to finish necessary work first"
+    ],
+    "Advanced": [
+      "Identify potential distractions ahead of time and remove them before starting work",
+      "Maintain laser focus during long, complex tasks (like a multi-hour project)",
+      "Stay calm and focused even in stressful or emotional situations"
+    ]
+  },
+  "Cognitive Flexibility": {
+    "Emerging": [
+      "Try to stay calm when plans change - it's okay if things are different!",
+      "If one way doesn't work, try asking for help to find another way",
+      "Give yourself time to adjust when transitioning between activities"
+    ],
+    "Developing": [
+      "When Plan A fails, brainstorm a Plan B with help",
+      "Accept small changes to routines without getting too upset",
+      "Try seeing a problem from another person's perspective"
+    ],
+    "Proficient": [
+      "Easily switch between different tasks or subjects",
+      "Generate multiple solutions to a problem and choose the best one",
+      "Adapt your strategy when you get new information that changes things"
+    ],
+    "Advanced": [
+      "Embrace challenges and changes as opportunities to grow",
+      "Come up with creative, innovative solutions by thinking in new ways",
+      "Hold multiple conflicting ideas in your mind and evaluate them fairly"
+    ]
+  },
+  "Planning & Prioritization": {
+    "Emerging": [
+      "Ask someone to help you make a plan before starting big tasks",
+      "Guess how long something will take (you'll get better with practice!)",
+      "Work on the most important thing first"
+    ],
+    "Developing": [
+      "Create simple step-by-step plans when given guidance",
+      "Prioritize your top 2-3 tasks with adult help",
+      "Break large projects into smaller chunks (one page at a time!)"
+    ],
+    "Proficient": [
+      "Make detailed plans for long-term projects on your own",
+      "Estimate time accurately: 'This will take about 30 minutes'",
+      "Prioritize based on what's urgent AND important"
+    ],
+    "Advanced": [
+      "Create backup plans in case your first plan doesn't work out",
+      "Manage multiple big projects at the same time without getting overwhelmed",
+      "Allocate your time, energy, and materials for maximum efficiency"
+    ]
+  },
+  "Organization": {
+    "Emerging": [
+      "Try to keep your desk and backpack somewhat tidy with daily reminders",
+      "Use a folder or binder to keep papers from getting lost",
+      "Clean out your backpack once a week - toss old papers and trash"
+    ],
+    "Developing": [
+      "Keep materials organized with daily adult check-ins",
+      "Use a planner (even if you forget to check it sometimes)",
+      "Have a specific place for everything - keys, homework, pencils"
+    ],
+    "Proficient": [
+      "Maintain organized physical and digital workspaces independently",
+      "Use a planner or digital tool consistently to track assignments",
+      "Take clear, structured notes that help you study later"
+    ],
+    "Advanced": [
+      "Develop your own personalized organization system that works for YOU",
+      "Help friends or classmates organize their materials or study space",
+      "Create long-term filing systems so you can find information months later"
+    ]
+  },
+  "Task Initiation": {
+    "Emerging": [
+      "Start working after 1-2 reminders from an adult",
+      "Ask for help figuring out the first step of a task",
+      "Try to begin even when the task seems hard or boring"
+    ],
+    "Developing": [
+      "Start tasks with just one reminder",
+      "Begin work if someone tells you the very first thing to do",
+      "Find one thing that interests you about the task to help you start"
+    ],
+    "Proficient": [
+      "Start tasks quickly even if they're challenging or uninteresting",
+      "Break down large tasks and identify your own first step",
+      "Use the '2-minute rule': if it takes less than 2 minutes, do it now!"
+    ],
+    "Advanced": [
+      "Jump into complex, self-directed projects with enthusiasm",
+      "Motivate yourself AND others to get started on work",
+      "Generate multiple possible starting points and pick the best one"
+    ]
+  },
+  "Critical Thinking": {
+    "Emerging": [
+      "Ask questions when something doesn't make sense to you",
+      "Learn to tell the difference between a fact and someone's opinion",
+      "Don't believe everything you hear - it's okay to wonder if it's true"
+    ],
+    "Developing": [
+      "Separate facts from opinions by asking 'How do we know this is true?'",
+      "Question information when reminded to think critically",
+      "Identify simple bias: 'Does this person have a reason to say this?'"
+    ],
+    "Proficient": [
+      "Analyze information from multiple sources before forming an opinion",
+      "Check the credibility of sources: Who wrote this? Are they an expert?",
+      "Build arguments supported by solid evidence, not just feelings"
+    ],
+    "Advanced": [
+      "Combine complex, even contradictory information to form original insights",
+      "Develop and test your own hypotheses like a scientist",
+      "Identify and challenge hidden assumptions in arguments and problems"
+    ]
+  },
+  "Communication": {
+    "Emerging": [
+      "Try to express your ideas clearly, even if they're not perfect",
+      "Speak up in small groups, even if it feels scary at first",
+      "Write in complete sentences and check your work for big errors"
+    ],
+    "Developing": [
+      "Share basic information clearly so others understand you",
+      "Participate in discussions when the teacher calls on you",
+      "Write organized paragraphs with a beginning, middle, and end"
+    ],
+    "Proficient": [
+      "Explain complex ideas clearly in both speaking and writing",
+      "Adjust how you communicate based on your audience (formal vs. casual)",
+      "Use digital tools (slides, videos, documents) to share your ideas effectively"
+    ],
+    "Advanced": [
+      "Use sophisticated vocabulary and persuasive techniques to inspire others",
+      "Communicate effectively across cultural and language differences",
+      "Create compelling presentations that influence how people think"
+    ]
+  },
+  "Collaboration": {
+    "Emerging": [
+      "Work with your group even if it's hard - don't withdraw or take over",
+      "Try to share responsibilities and take turns doing tasks",
+      "Focus on the whole project, not just your own part"
+    ],
+    "Developing": [
+      "Work well in groups when everyone has clear roles and supervision",
+      "Share your ideas when asked and listen to others' ideas too",
+      "Compromise on small things when your group can't agree"
+    ],
+    "Proficient": [
+      "Work effectively and respectfully with all kinds of team members",
+      "Really listen to others' ideas and build on them",
+      "Share responsibility equally and help your group succeed together"
+    ],
+    "Advanced": [
+      "Lead collaborative projects by creating an inclusive environment",
+      "Help resolve group conflicts in constructive, fair ways",
+      "Elevate the quality of group work through shared vision and effort"
+    ]
+  },
+  "Creativity & Innovation": {
+    "Emerging": [
+      "Try new approaches instead of always copying what others do",
+      "Brainstorm ideas even if they seem silly at first",
+      "Be willing to try something different when encouraged"
+    ],
+    "Developing": [
+      "Generate a few original ideas when given a specific prompt",
+      "Try a new approach if someone guides you through it",
+      "Build on other people's ideas to make them your own"
+    ],
+    "Proficient": [
+      "Come up with original ideas and solutions on your own",
+      "Refine and improve your ideas based on feedback",
+      "Apply creative thinking to solve real problems in new ways"
+    ],
+    "Advanced": [
+      "Consistently produce truly novel and valuable solutions",
+      "Connect seemingly unrelated concepts to create innovations",
+      "Inspire others to think creatively and take creative risks"
+    ]
+  },
+  "Digital Literacy": {
+    "Emerging": [
+      "Learn to use technology for schoolwork, not just games and videos",
+      "Practice organizing files into folders so you can find them later",
+      "Create a strong password and keep it private"
+    ],
+    "Developing": [
+      "Use required software and apps for school assignments",
+      "Understand basic online safety: don't share personal information",
+      "Ask for help evaluating if a website is trustworthy"
+    ],
+    "Proficient": [
+      "Use a variety of digital tools for research, organization, and creation",
+      "Practice safe, ethical, and responsible online behavior",
+      "Evaluate the reliability of online sources before trusting them"
+    ],
+    "Advanced": [
+      "Critically analyze digital information and media for bias and accuracy",
+      "Troubleshoot technical problems on your own or with minimal help",
+      "Use advanced tools to create and manage complex digital projects"
+    ]
+  },
+  "Global Awareness": {
+    "Emerging": [
+      "Learn about countries and cultures beyond your own community",
+      "Show curiosity when you encounter people with different backgrounds",
+      "Recognize that not everyone lives the same way you do"
+    ],
+    "Developing": [
+      "Name a few global issues like climate change or poverty",
+      "Ask questions and show interest when learning about diverse cultures",
+      "Understand that people around the world are both similar and different"
+    ],
+    "Proficient": [
+      "Explain how global issues like climate or economics are interconnected",
+      "Appreciate and respect diverse cultures and perspectives",
+      "Recognize how local decisions can have global impacts"
+    ],
+    "Advanced": [
+      "Research and advocate for solutions to global challenges",
+      "Apply cross-cultural understanding in real interactions with others",
+      "See local issues through a global lens and vice versa"
+    ]
+  }
+}

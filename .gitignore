@@ -16,6 +16,10 @@ ENV/
 # Docker
 postgres_data/
 
+# Secrets
+secrets/
+*.txt
+
 # IDE
 .vscode/
 .idea/

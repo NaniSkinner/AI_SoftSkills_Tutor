@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Road to Skills Journey Map</title>
+
+    <!-- React and ReactDOM from CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+    <!-- Babel Standalone for JSX transformation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Architects+Daughter&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Patrick Hand', cursive;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        #root {
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Main container */
+        .journey-container {
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+            background: linear-gradient(135deg, #FFF8E7 0%, #F5E6D3 100%);
+            padding: 20px;
+        }
+
+        /* Header */
+        .journey-header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 20px;
+            border: 3px solid #8B7355;
+            box-shadow: 6px 6px 0px rgba(160, 147, 125, 0.8);
+        }
+
+        .journey-title {
+            font-family: 'Architects Daughter', cursive;
+            font-size: 2.5rem;
+            color: #5D4E37;
+            text-shadow: 2px 2px 0px #E8C5A5;
+            margin-bottom: 10px;
+        }
+
+        .journey-subtitle {
+            font-size: 1.2rem;
+            color: #7FA99B;
+        }
+
+        /* Goal Banner */
+        .goal-banner {
+            background: linear-gradient(135deg, #FFE57F 0%, #FFD54F 100%);
+            border: 3px solid #F57C00;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 6px 6px 0px #FFCA28;
+        }
+
+        .goal-banner-text {
+            font-size: 1.3rem;
+            color: #E65100;
+            font-weight: bold;
+        }
+
+        .goal-progression {
+            font-size: 1.5rem;
+            margin-top: 10px;
+            color: #F57F17;
+        }
+
+        /* Zoom container - allows zooming and panning */
+        .zoom-viewport {
+            position: relative;
+            width: 100%;
+            height: 900px;
+            overflow: hidden; /* Changed from auto to hidden - we'll handle panning manually */
+            border: 3px solid #8B7355;
+            border-radius: 20px;
+            background: #F5E6D3;
+            margin: 20px auto;
+            cursor: grab;
+        }
+
+        .zoom-viewport:active {
+            cursor: grabbing;
+        }
+
+        /* Skills path container - has background image and holds skill cards */
+        .skills-path-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            min-height: 1800px; /* Taller container to match path aspect ratio */
+            background-image: url('%BACKGROUND_IMAGE%');
+            background-size: contain; /* Changed to contain so we see the full image */
+            background-position: center top;
+            background-repeat: no-repeat;
+            transform-origin: center top;
+            transition: transform 0.3s ease;
+            will-change: transform;
+        }
+
+        /* Prevent text selection while dragging */
+        .zoom-viewport.dragging * {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        /* Skill Card */
+        .skill-card {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.95);
+            border: 3px solid #8B7355;
+            border-radius: 20px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 6px 6px 0px rgba(160, 147, 125, 0.8);
+            min-width: 180px;
+            max-width: 220px;
+            z-index: 10;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 8px 8px 0px rgba(127, 169, 155, 0.9);
+            z-index: 20;
+        }
+
+        .skill-card.locked {
+            opacity: 0.6;
+            filter: grayscale(70%);
+            cursor: not-allowed;
+        }
+
+        .skill-card.current {
+            border-color: #FFA000;
+            box-shadow: 0 0 20px #FFA726, 6px 6px 0px #FFCA28;
+            animation: glow-pulse 2s infinite;
+        }
+
+        .skill-card.achieved {
+            border-color: #66BB6A;
+            background: linear-gradient(135deg, rgba(232, 245, 233, 0.95) 0%, rgba(200, 230, 201, 0.95) 100%);
+        }
+
+        @keyframes glow-pulse {
+            0%, 100% { box-shadow: 0 0 20px #FFA726, 6px 6px 0px #FFCA28; }
+            50% { box-shadow: 0 0 30px #FF6F00, 8px 8px 0px #FFB74D; }
+        }
+
+        .skill-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .skill-icon {
+            font-size: 2rem;
+        }
+
+        .skill-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #5D4E37;
+            flex: 1;
+            line-height: 1.2;
+        }
+
+        .level-indicator {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .level-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #E0E0E0;
+            border: 2px solid #9E9E9E;
+        }
+
+        .level-dot.completed {
+            background: #66BB6A;
+            border-color: #388E3C;
+        }
+
+        .level-dot.current {
+            background: #FFA726;
+            border-color: #F57C00;
+            animation: pulse-dot 1.5s infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+
+        /* Expanded Tips */
+        .skill-tips {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px dashed #A0937D;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .skill-tips.expanded {
+            max-height: 500px;
+        }
+
+        .tips-title {
+            font-size: 1rem;
+            color: #F57F17;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .tip-item {
+            background: #FFF9C4;
+            border: 2px solid #FBC02D;
+            border-radius: 10px;
+            padding: 8px 12px;
+            margin: 8px 0;
+            font-size: 0.9rem;
+            color: #5D4037;
+            display: flex;
+            gap: 8px;
+            align-items: start;
+        }
+
+        .tip-bullet {
+            font-weight: bold;
+            color: #F57F17;
+            flex-shrink: 0;
+        }
+
+        /* Student Avatar on Path */
+        .student-avatar {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            z-index: 100;
+            animation: avatar-float 3s ease-in-out infinite;
+            filter: drop-shadow(4px 4px 6px rgba(0, 0, 0, 0.3));
+        }
+
+        .student-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        @keyframes avatar-float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Zoom Controls */
+        .zoom-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .zoom-btn {
+            background: rgba(255, 255, 255, 0.95);
+            border: 3px solid #8B7355;
+            border-radius: 10px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 4px 4px 0px rgba(160, 147, 125, 0.8);
+        }
+
+        .zoom-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 6px 6px 0px rgba(127, 169, 155, 0.9);
+        }
+
+        .zoom-btn:active {
+            transform: translateY(0px);
+            box-shadow: 2px 2px 0px rgba(160, 147, 125, 0.8);
+        }
+
+        /* Zoom level indicator */
+        .zoom-level {
+            background: rgba(255, 255, 255, 0.95);
+            border: 3px solid #8B7355;
+            border-radius: 10px;
+            padding: 8px 12px;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #5D4E37;
+            box-shadow: 4px 4px 0px rgba(160, 147, 125, 0.8);
+        }
+
+        /* Legend */
+        .legend {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 3px solid #8B7355;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 6px 6px 0px rgba(160, 147, 125, 0.8);
+            z-index: 300;
+            max-width: 200px;
+        }
+
+        .legend-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #5D4E37;
+            margin-bottom: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 8px 0;
+            font-size: 0.95rem;
+            color: #5D4E37;
+        }
+
+        .legend-icon {
+            font-size: 1.5rem;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 400px;
+            gap: 20px;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid #E0E0E0;
+            border-top: 5px solid #7FA99B;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 1.3rem;
+            color: #7FA99B;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .journey-title {
+                font-size: 2rem;
+            }
+
+            .skill-card {
+                min-width: 140px;
+                max-width: 160px;
+                padding: 10px;
+            }
+
+            .student-avatar {
+                width: 60px;
+                height: 60px;
+            }
+
+            .legend {
+                bottom: 10px;
+                right: 10px;
+                padding: 10px;
+                font-size: 0.85rem;
+                max-width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Skill Tips Data (embedded)
+        const SKILL_TIPS = %SKILL_TIPS_DATA%;
+
+        // Visual Configuration
+        const VISUALS = %VISUAL_CONFIG_DATA%;
+
+        /**
+         * Path coordinates - cards positioned NEXT TO the winding path
+         * Alternating left and right of the path
+         * y-coordinates match the path curve, x-coordinates offset to sides
+         */
+        const PATH_COORDINATES = [
+            // Bottom area - starting point (flowers) - Emerging
+            { x: 30, y: 85, level: 'Emerging' },      // Left side
+            { x: 70, y: 78, level: 'Emerging' },      // Right side
+            { x: 25, y: 71, level: 'Emerging' },      // Left side
+
+            // First curve - lower section - Developing
+            { x: 75, y: 64, level: 'Developing' },    // Right side
+            { x: 25, y: 57, level: 'Developing' },    // Left side
+            { x: 70, y: 50, level: 'Developing' },    // Right side
+
+            // Second curve - middle section - Proficient
+            { x: 30, y: 43, level: 'Proficient' },    // Left side
+            { x: 75, y: 36, level: 'Proficient' },    // Right side
+            { x: 28, y: 29, level: 'Proficient' },    // Left side
+
+            // Top section - approaching tree - Advanced
+            { x: 72, y: 22, level: 'Advanced' },      // Right side
+            { x: 30, y: 15, level: 'Advanced' },      // Left side
+            { x: 50, y: 8, level: 'Advanced' },       // Center near tree
+        ];
+
+        // Skill Card Component
+        const SkillCard = ({ skill, isExpanded, onToggle, position }) => {
+            const levelIcons = ['🌱', '🥉', '🥈', '🥇'];
+            const levelNames = ['Emerging', 'Developing', 'Proficient', 'Advanced'];
+
+            const currentLevelIndex = skill.currentLevel ? levelNames.indexOf(skill.currentLevel) : 0;
+            const isLocked = skill.status === 'locked';
+            const isCurrent = skill.status === 'in-progress';
+            const isAchieved = skill.status === 'achieved';
+
+            const tips = SKILL_TIPS[skill.name]?.[skill.currentLevel] || [
+                'Keep practicing this skill every day!',
+                'Ask your teacher for feedback',
+                'Notice when you use this skill successfully'
+            ];
+
+            const cardClass = `skill-card ${isLocked ? 'locked' : ''} ${isCurrent ? 'current' : ''} ${isAchieved ? 'achieved' : ''}`;
+
+            return (
+                <div
+                    className={cardClass}
+                    style={{
+                        left: `${position.x}%`,
+                        top: `${position.y}%`,
+                        transform: 'translate(-50%, -50%)'
+                    }}
+                    onClick={() => !isLocked && onToggle()}
+                >
+                    <div className="skill-card-header">
+                        <span className="skill-icon">{levelIcons[currentLevelIndex]}</span>
+                        <span className="skill-name">{skill.name}</span>
+                        {isLocked && <span>🔒</span>}
+                        {isAchieved && <span>✅</span>}
+                    </div>
+
+                    <div className="level-indicator">
+                        {levelNames.map((_, idx) => (
+                            <div
+                                key={idx}
+                                className={`level-dot ${
+                                    idx < currentLevelIndex ? 'completed' :
+                                    idx === currentLevelIndex ? 'current' : ''
+                                }`}
+                            />
+                        ))}
+                    </div>
+
+                    <div className={`skill-tips ${isExpanded ? 'expanded' : ''}`}>
+                        <div className="tips-title">💡 Tips to grow:</div>
+                        {tips.map((tip, idx) => (
+                            <div key={idx} className="tip-item">
+                                <span className="tip-bullet">{idx + 1}.</span>
+                                <span>{tip}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        };
+
+        // Main Road to Skills Component
+        const RoadToSkillsMap = ({ studentData, currentGoal, avatarUrl }) => {
+            const [expandedCard, setExpandedCard] = useState(null);
+            const [skills, setSkills] = useState([]);
+            const [avatarPosition, setAvatarPosition] = useState({ x: 50, y: 50 });
+            const [zoomLevel, setZoomLevel] = useState(0.8); // Start zoomed out to see full path
+            const [panPosition, setPanPosition] = useState({ x: 0, y: 0 });
+            const [isDragging, setIsDragging] = useState(false);
+            const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+            const [hasAutoZoomed, setHasAutoZoomed] = useState(false); // Track if auto-zoom happened
+            const viewportRef = React.useRef(null);
+            const containerRef = React.useRef(null);
+
+            useEffect(() => {
+                // Transform API data into component format
+                if (studentData && Array.isArray(studentData)) {
+                    const transformedSkills = studentData.map(skill => {
+                        const latestAssessment = skill.assessments?.[skill.assessments.length - 1];
+                        const currentLevel = latestAssessment?.level || 'E';
+                        const levelMap = { 'E': 'Emerging', 'D': 'Developing', 'P': 'Proficient', 'A': 'Advanced' };
+
+                        return {
+                            name: skill.skill_name,
+                            category: skill.skill_category,
+                            currentLevel: levelMap[currentLevel] || currentLevel,
+                            status: latestAssessment ? 'in-progress' : 'locked',
+                            assessments: skill.assessments || []
+                        };
+                    });
+                    setSkills(transformedSkills);
+
+                    // Calculate avatar position based on overall progress
+                    const avgProgress = transformedSkills.reduce((sum, s) => {
+                        const levelMap = { 'Emerging': 0, 'Developing': 1, 'Proficient': 2, 'Advanced': 3 };
+                        return sum + (levelMap[s.currentLevel] || 0);
+                    }, 0) / transformedSkills.length;
+
+                    // Map progress to path position
+                    const progressIndex = Math.floor(avgProgress * (PATH_COORDINATES.length / 4));
+                    const pathPos = PATH_COORDINATES[Math.min(progressIndex, PATH_COORDINATES.length - 1)];
+                    setAvatarPosition(pathPos);
+
+                    // Auto-zoom animation: Show full map for 3 seconds, then zoom to current position
+                    // Only trigger once per session
+                    if (!hasAutoZoomed) {
+                        setTimeout(() => {
+                            setZoomLevel(1.2); // Zoom in to current level
+                            setHasAutoZoomed(true);
+
+                            // Pan to current position after zoom
+                            if (containerRef.current && viewportRef.current) {
+                                const containerHeight = containerRef.current.offsetHeight;
+                                const viewportHeight = viewportRef.current.clientHeight;
+                                const targetY = (pathPos.y / 100) * containerHeight * 1.2; // Account for zoom
+                                const centerY = viewportHeight / 2;
+                                const newPanY = centerY - targetY;
+
+                                // Apply boundary limits
+                                const bounds = calculatePanBounds(1.2);
+                                setPanPosition({
+                                    x: 0, // Keep centered horizontally
+                                    y: Math.max(bounds.minY, Math.min(bounds.maxY, newPanY))
+                                });
+                            }
+                        }, 3000); // 3 second delay
+                    }
+                }
+            }, [studentData, hasAutoZoomed]);
+
+            // Calculate pan boundaries to prevent dragging outside the map
+            const calculatePanBounds = (zoom) => {
+                if (!containerRef.current || !viewportRef.current) {
+                    return { minX: 0, maxX: 0, minY: 0, maxY: 0 };
+                }
+
+                const containerWidth = containerRef.current.offsetWidth * zoom;
+                const containerHeight = containerRef.current.offsetHeight * zoom;
+                const viewportWidth = viewportRef.current.clientWidth;
+                const viewportHeight = viewportRef.current.clientHeight;
+
+                return {
+                    minX: Math.min(0, viewportWidth - containerWidth),
+                    maxX: 0,
+                    minY: Math.min(0, viewportHeight - containerHeight),
+                    maxY: 0
+                };
+            };
+
+            // Drag handlers for pan
+            const handleMouseDown = (e) => {
+                // Don't start drag if clicking on a skill card or zoom controls
+                if (e.target.closest('.skill-card') || e.target.closest('.zoom-controls')) {
+                    return;
+                }
+
+                setIsDragging(true);
+                setDragStart({
+                    x: e.clientX - panPosition.x,
+                    y: e.clientY - panPosition.y
+                });
+
+                if (viewportRef.current) {
+                    viewportRef.current.classList.add('dragging');
+                }
+            };
+
+            const handleMouseMove = (e) => {
+                if (!isDragging) return;
+
+                const newX = e.clientX - dragStart.x;
+                const newY = e.clientY - dragStart.y;
+
+                // Apply boundaries
+                const bounds = calculatePanBounds(zoomLevel);
+                setPanPosition({
+                    x: Math.max(bounds.minX, Math.min(bounds.maxX, newX)),
+                    y: Math.max(bounds.minY, Math.min(bounds.maxY, newY))
+                });
+            };
+
+            const handleMouseUp = () => {
+                setIsDragging(false);
+                if (viewportRef.current) {
+                    viewportRef.current.classList.remove('dragging');
+                }
+            };
+
+            // Touch handlers for mobile
+            const handleTouchStart = (e) => {
+                if (e.touches.length !== 1) return;
+                if (e.target.closest('.skill-card') || e.target.closest('.zoom-controls')) {
+                    return;
+                }
+
+                const touch = e.touches[0];
+                setIsDragging(true);
+                setDragStart({
+                    x: touch.clientX - panPosition.x,
+                    y: touch.clientY - panPosition.y
+                });
+            };
+
+            const handleTouchMove = (e) => {
+                if (!isDragging || e.touches.length !== 1) return;
+
+                const touch = e.touches[0];
+                const newX = touch.clientX - dragStart.x;
+                const newY = touch.clientY - dragStart.y;
+
+                const bounds = calculatePanBounds(zoomLevel);
+                setPanPosition({
+                    x: Math.max(bounds.minX, Math.min(bounds.maxX, newX)),
+                    y: Math.max(bounds.minY, Math.min(bounds.maxY, newY))
+                });
+            };
+
+            const handleTouchEnd = () => {
+                setIsDragging(false);
+            };
+
+            // Zoom functions
+            const handleZoomIn = () => {
+                setZoomLevel(prev => {
+                    const newZoom = Math.min(prev + 0.2, 2.5);
+                    // Adjust pan position to keep content roughly centered
+                    const bounds = calculatePanBounds(newZoom);
+                    setPanPosition(current => ({
+                        x: Math.max(bounds.minX, Math.min(bounds.maxX, current.x)),
+                        y: Math.max(bounds.minY, Math.min(bounds.maxY, current.y))
+                    }));
+                    return newZoom;
+                });
+            };
+
+            const handleZoomOut = () => {
+                setZoomLevel(prev => {
+                    const newZoom = Math.max(prev - 0.2, 0.6);
+                    // Adjust pan position to keep content roughly centered
+                    const bounds = calculatePanBounds(newZoom);
+                    setPanPosition(current => ({
+                        x: Math.max(bounds.minX, Math.min(bounds.maxX, current.x)),
+                        y: Math.max(bounds.minY, Math.min(bounds.maxY, current.y))
+                    }));
+                    return newZoom;
+                });
+            };
+
+            const handleZoomReset = () => {
+                setZoomLevel(1.2);
+                setPanPosition({ x: 0, y: 0 }); // Reset pan position
+            };
+
+            const handleFitToScreen = () => {
+                setZoomLevel(0.8);
+                setPanPosition({ x: 0, y: 0 }); // Reset to top center
+            };
+
+            // Add global mouse/touch listeners for drag
+            useEffect(() => {
+                if (isDragging) {
+                    window.addEventListener('mousemove', handleMouseMove);
+                    window.addEventListener('mouseup', handleMouseUp);
+                    window.addEventListener('touchmove', handleTouchMove);
+                    window.addEventListener('touchend', handleTouchEnd);
+
+                    return () => {
+                        window.removeEventListener('mousemove', handleMouseMove);
+                        window.removeEventListener('mouseup', handleMouseUp);
+                        window.removeEventListener('touchmove', handleTouchMove);
+                        window.removeEventListener('touchend', handleTouchEnd);
+                    };
+                }
+            }, [isDragging, dragStart, panPosition, zoomLevel]);
+
+            return (
+                <div className="journey-container">
+                    <div className="journey-header">
+                        <h1 className="journey-title">🗺️ Your Road to Skills</h1>
+                        <p className="journey-subtitle">Follow the path to the tree of growth!</p>
+                    </div>
+
+                    {currentGoal && currentGoal.skill_name && (
+                        <div className="goal-banner">
+                            <div className="goal-banner-text">
+                                🎯 Your current goal: {currentGoal.skill_name}
+                            </div>
+                            <div className="goal-progression">
+                                {currentGoal.starting_level} → {currentGoal.target_level}
+                            </div>
+                        </div>
+                    )}
+
+                    {skills.length === 0 ? (
+                        <div className="loading">
+                            <div className="loading-spinner"></div>
+                            <div className="loading-text">Loading your journey...</div>
+                        </div>
+                    ) : (
+                        <div
+                            className="zoom-viewport"
+                            ref={viewportRef}
+                            onMouseDown={handleMouseDown}
+                            onTouchStart={handleTouchStart}
+                        >
+                            {/* Zoom Controls */}
+                            <div className="zoom-controls">
+                                <div
+                                    className="zoom-btn"
+                                    onClick={handleZoomIn}
+                                    title="Zoom In"
+                                >
+                                    +
+                                </div>
+                                <div className="zoom-level">
+                                    {Math.round(zoomLevel * 100)}%
+                                </div>
+                                <div
+                                    className="zoom-btn"
+                                    onClick={handleZoomOut}
+                                    title="Zoom Out"
+                                >
+                                    −
+                                </div>
+                                <div
+                                    className="zoom-btn"
+                                    onClick={handleFitToScreen}
+                                    title="Fit to Screen"
+                                    style={{ fontSize: '1.2rem' }}
+                                >
+                                    ⊡
+                                </div>
+                            </div>
+
+                            {/* Pannable and Zoomable Map Container with Background */}
+                            <div
+                                ref={containerRef}
+                                className="skills-path-container"
+                                style={{
+                                    transform: `translate(${panPosition.x}px, ${panPosition.y}px) scale(${zoomLevel})`,
+                                    transformOrigin: 'top center'
+                                }}
+                            >
+                                {/* Position skills along the path */}
+                                {skills.slice(0, PATH_COORDINATES.length).map((skill, idx) => (
+                                    <SkillCard
+                                        key={skill.name}
+                                        skill={skill}
+                                        isExpanded={expandedCard === skill.name}
+                                        onToggle={() => setExpandedCard(expandedCard === skill.name ? null : skill.name)}
+                                        position={PATH_COORDINATES[idx]}
+                                    />
+                                ))}
+
+                                {/* Student Avatar */}
+                                {avatarUrl && (
+                                    <div
+                                        className="student-avatar"
+                                        style={{
+                                            left: `${avatarPosition.x}%`,
+                                            top: `${avatarPosition.y}%`,
+                                            transform: 'translate(-50%, -50%)'
+                                        }}
+                                    >
+                                        <img src={avatarUrl} alt="Your avatar" />
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="legend">
+                        <div className="legend-title">Legend</div>
+                        <div className="legend-item">
+                            <span className="legend-icon">🌱</span>
+                            <span>Emerging</span>
+                        </div>
+                        <div className="legend-item">
+                            <span className="legend-icon">🥉</span>
+                            <span>Developing</span>
+                        </div>
+                        <div className="legend-item">
+                            <span className="legend-icon">🥈</span>
+                            <span>Proficient</span>
+                        </div>
+                        <div className="legend-item">
+                            <span className="legend-icon">🥇</span>
+                            <span>Advanced</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // App Entry Point
+        const App = () => {
+            const studentData = window.STUDENT_DATA || [];
+            const currentGoal = window.CURRENT_GOAL || null;
+            const avatarUrl = window.AVATAR_URL || '';
+
+            return (
+                <RoadToSkillsMap
+                    studentData={studentData}
+                    currentGoal={currentGoal}
+                    avatarUrl={avatarUrl}
+                />
+            );
+        };
+
+        // Render
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

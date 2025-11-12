@@ -1,5 +1,7 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import sys
+import json
 from pathlib import Path
 
 # Add utils to path
@@ -238,6 +240,10 @@ if 'student_id' not in st.session_state or not st.session_state.student_id:
 student_name = st.session_state.student_name
 student_id = st.session_state.student_id
 
+# Initialize view mode in session state
+if 'journey_view_mode' not in st.session_state:
+    st.session_state.journey_view_mode = 'classic'
+
 # Header with avatar
 col1, col2, col3 = st.columns([1, 3, 1])
 with col1:
@@ -249,144 +255,210 @@ with col3:
     if st.button("🏠 Home"):
         st.switch_page("pages/Student_00_Home.py")
 
+# View mode toggle
+st.markdown("---")
+view_mode = st.radio(
+    "Choose your view:",
+    ["📊 Classic Progress Bars", "🗺️ Road to Skills Map"],
+    horizontal=True,
+    key="view_mode_selector"
+)
+st.session_state.journey_view_mode = 'road' if view_mode == "🗺️ Road to Skills Map" else 'classic'
+st.markdown("---")
+
 # Fetch student data
 try:
     with st.spinner("Loading your amazing progress..."):
         skill_trends = APIClient.get_skill_trends(student_id)
         progress_data = APIClient.get_student_progress(student_id)
+        active_targets = APIClient.get_student_targets(student_id, completed=False)
 
     if not skill_trends:
         st.info("Your journey is just beginning! Ask your teacher to add some activities.")
         st.stop()
 
-    # Progress stats
-    st.markdown("### 📊 Your Progress at a Glance")
-    stat_col1, stat_col2, stat_col3 = st.columns(3)
+    # Conditional rendering based on view mode
+    if st.session_state.journey_view_mode == 'road':
+        # Load Road to Skills interactive map (enhanced version with background)
+        component_path = Path(__file__).parent.parent / 'components' / 'road_to_skills_enhanced.html'
+        skill_tips_path = Path(__file__).parent.parent / 'data' / 'skill_tips.json'
+        visual_config_path = Path(__file__).parent.parent / 'data' / 'skill_visuals.json'
+        background_img_path = Path(__file__).parent.parent / 'assets' / 'backgrounds' / 'road_map_background.png'
 
-    with stat_col1:
-        st.markdown(f"""
-        <div class="stats-box">
-            <div class="stat-number">{progress_data.get('total_assessments', 0)}</div>
-            <div class="stat-label">Skills Tracked</div>
-        </div>
-        """, unsafe_allow_html=True)
+        # Load JSON data
+        with open(skill_tips_path, 'r') as f:
+            skill_tips_data = json.load(f)
+        with open(visual_config_path, 'r') as f:
+            visual_config_data = json.load(f)
 
-    with stat_col2:
-        # Count skills at Proficient or Advanced
-        high_level_skills = sum(1 for skill in skill_trends
-                               if skill['assessments'] and
-                               skill['assessments'][-1]['level'] in ['P', 'Proficient', 'A', 'Advanced'])
-        st.markdown(f"""
-        <div class="stats-box">
-            <div class="stat-number">{high_level_skills}</div>
-            <div class="stat-label">Strong Skills</div>
-        </div>
-        """, unsafe_allow_html=True)
+        # Convert background image to base64
+        import base64
+        with open(background_img_path, 'rb') as f:
+            background_base64 = base64.b64encode(f.read()).decode()
+        background_data_url = f"data:image/png;base64,{background_base64}"
 
-    with stat_col3:
-        st.markdown(f"""
-        <div class="stats-box">
-            <div class="stat-number">{progress_data.get('total_badges', 0)}</div>
-            <div class="stat-label">Badges Earned</div>
-        </div>
-        """, unsafe_allow_html=True)
+        # Load HTML template
+        with open(component_path, 'r') as f:
+            component_html = f.read()
 
-    # Motivational message
-    if high_level_skills > 0:
-        st.markdown(f"""
-        <div class="progress-message">
-            🌟 Amazing! You're getting stronger in {high_level_skills} skill{"s" if high_level_skills != 1 else ""}! Keep up the great work!
-        </div>
-        """, unsafe_allow_html=True)
+        # Replace placeholders with actual data
+        component_html = component_html.replace('%SKILL_TIPS_DATA%', json.dumps(skill_tips_data))
+        component_html = component_html.replace('%VISUAL_CONFIG_DATA%', json.dumps(visual_config_data))
+        component_html = component_html.replace('%BACKGROUND_IMAGE%', background_data_url)
 
-    # Group skills by category
-    skills_by_category = {
-        "Social-Emotional Learning (SEL)": [],
-        "Executive Function (EF)": [],
-        "21st Century Skills": []
-    }
+        # Prepare data for component
+        current_goal = active_targets[0] if active_targets else {}
+        avatar_url = st.session_state.get('avatar_url', '')
 
-    for skill in skill_trends:
-        category = skill['skill_category']
-        if category == "SEL":
-            skills_by_category["Social-Emotional Learning (SEL)"].append(skill)
-        elif category == "EF":
-            skills_by_category["Executive Function (EF)"].append(skill)
-        elif category == "21st Century":
-            skills_by_category["21st Century Skills"].append(skill)
+        # Inject data as JavaScript variables before the App render
+        data_injection = f"""
+        <script>
+            window.STUDENT_DATA = {json.dumps(skill_trends)};
+            window.CURRENT_GOAL = {json.dumps(current_goal)};
+            window.AVATAR_URL = '{avatar_url}';
+        </script>
+        """
 
-    # Display skills by category
-    st.markdown("---")
-    st.markdown("### 🌈 Your Skills by Type")
+        # Insert data injection before closing body tag
+        component_html = component_html.replace('</body>', f'{data_injection}</body>')
 
-    category_icons = {
-        "Social-Emotional Learning (SEL)": "❤️",
-        "Executive Function (EF)": "🧠",
-        "21st Century Skills": "🚀"
-    }
+        # Add cache-busting meta tag
+        cache_buster = f'<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" /><meta http-equiv="Pragma" content="no-cache" /><meta http-equiv="Expires" content="0" />'
+        component_html = component_html.replace('<head>', f'<head>{cache_buster}')
 
-    category_classes = {
-        "Social-Emotional Learning (SEL)": "category-SEL",
-        "Executive Function (EF)": "category-EF",
-        "21st Century Skills": "category-21st"
-    }
+        # Render component with increased height for scrolling
+        components.html(component_html, height=1200, scrolling=True)
 
-    for category_name, skills in skills_by_category.items():
-        if skills:
-            icon = category_icons.get(category_name, "⭐")
-            badge_class = category_classes.get(category_name, "")
+    else:
+        # Show classic progress bars view
+        # Progress stats
+        st.markdown("### 📊 Your Progress at a Glance")
+        stat_col1, stat_col2, stat_col3 = st.columns(3)
 
-            st.markdown(f'<span class="category-badge {badge_class}">{icon} {category_name}</span>', unsafe_allow_html=True)
+        with stat_col1:
+            st.markdown(f"""
+            <div class="stats-box">
+                <div class="stat-number">{progress_data.get('total_assessments', 0)}</div>
+                <div class="stat-label">Skills Tracked</div>
+            </div>
+            """, unsafe_allow_html=True)
 
-            for skill in skills:
-                skill_name = skill['skill_name']
-                assessments = skill['assessments']
+        with stat_col2:
+            # Count skills at Proficient or Advanced
+            high_level_skills = sum(1 for skill in skill_trends
+                                   if skill['assessments'] and
+                                   skill['assessments'][-1]['level'] in ['P', 'Proficient', 'A', 'Advanced'])
+            st.markdown(f"""
+            <div class="stats-box">
+                <div class="stat-number">{high_level_skills}</div>
+                <div class="stat-label">Strong Skills</div>
+            </div>
+            """, unsafe_allow_html=True)
 
-                if assessments:
-                    current_assessment = assessments[-1]
-                    current_level = current_assessment['level']
+        with stat_col3:
+            st.markdown(f"""
+            <div class="stats-box">
+                <div class="stat-number">{progress_data.get('total_badges', 0)}</div>
+                <div class="stat-label">Badges Earned</div>
+            </div>
+            """, unsafe_allow_html=True)
 
-                    # Normalize level
-                    level_map = {'E': 'Emerging', 'D': 'Developing', 'P': 'Proficient', 'A': 'Advanced'}
-                    current_level_full = level_map.get(current_level, current_level)
+        # Motivational message
+        if high_level_skills > 0:
+            st.markdown(f"""
+            <div class="progress-message">
+                🌟 Amazing! You're getting stronger in {high_level_skills} skill{"s" if high_level_skills != 1 else ""}! Keep up the great work!
+            </div>
+            """, unsafe_allow_html=True)
 
-                    # Determine which levels are completed
-                    levels = ['Emerging', 'Developing', 'Proficient', 'Advanced']
-                    level_emojis = {'Emerging': '🌱', 'Developing': '🌿', 'Proficient': '🌳', 'Advanced': '🏆'}
-                    current_idx = levels.index(current_level_full) if current_level_full in levels else 0
+        # Group skills by category
+        skills_by_category = {
+            "Social-Emotional Learning (SEL)": [],
+            "Executive Function (EF)": [],
+            "21st Century Skills": []
+        }
 
-                    # Create skill card
-                    st.markdown(f"""
-                    <div class="skill-card">
-                        <h3 style="color: #00695C; margin-top: 0;">{skill_name}</h3>
-                        <div class="level-path">
-                            <div class="level-connector{'completed' if current_idx > 0 else ''}"></div>
-                    """, unsafe_allow_html=True)
+        for skill in skill_trends:
+            category = skill['skill_category']
+            if category == "SEL":
+                skills_by_category["Social-Emotional Learning (SEL)"].append(skill)
+            elif category == "EF":
+                skills_by_category["Executive Function (EF)"].append(skill)
+            elif category == "21st Century":
+                skills_by_category["21st Century Skills"].append(skill)
 
-                    # Create level steps
-                    level_cols = st.columns(4)
-                    for idx, (level, emoji) in enumerate(zip(levels, level_emojis.values())):
-                        with level_cols[idx]:
-                            if idx < current_idx:
-                                status_class = "completed"
-                                status_text = "✓"
-                            elif idx == current_idx:
-                                status_class = "current"
-                                status_text = emoji
-                            else:
-                                status_class = "locked"
-                                status_text = "🔒"
+        # Display skills by category
+        st.markdown("---")
+        st.markdown("### 🌈 Your Skills by Type")
 
-                            st.markdown(f"""
-                            <div style="text-align: center;">
-                                <div class="level-step {status_class}">{status_text}</div>
-                                <div class="level-label">{level[:3]}</div>
-                            </div>
-                            """, unsafe_allow_html=True)
+        category_icons = {
+            "Social-Emotional Learning (SEL)": "❤️",
+            "Executive Function (EF)": "🧠",
+            "21st Century Skills": "🚀"
+        }
 
-                    st.markdown("</div></div>", unsafe_allow_html=True)
+        category_classes = {
+            "Social-Emotional Learning (SEL)": "category-SEL",
+            "Executive Function (EF)": "category-EF",
+            "21st Century Skills": "category-21st"
+        }
 
-    # Navigation
+        for category_name, skills in skills_by_category.items():
+            if skills:
+                icon = category_icons.get(category_name, "⭐")
+                badge_class = category_classes.get(category_name, "")
+
+                st.markdown(f'<span class="category-badge {badge_class}">{icon} {category_name}</span>', unsafe_allow_html=True)
+
+                for skill in skills:
+                    skill_name = skill['skill_name']
+                    assessments = skill['assessments']
+
+                    if assessments:
+                        current_assessment = assessments[-1]
+                        current_level = current_assessment['level']
+
+                        # Normalize level
+                        level_map = {'E': 'Emerging', 'D': 'Developing', 'P': 'Proficient', 'A': 'Advanced'}
+                        current_level_full = level_map.get(current_level, current_level)
+
+                        # Determine which levels are completed
+                        levels = ['Emerging', 'Developing', 'Proficient', 'Advanced']
+                        level_emojis = {'Emerging': '🌱', 'Developing': '🌿', 'Proficient': '🌳', 'Advanced': '🏆'}
+                        current_idx = levels.index(current_level_full) if current_level_full in levels else 0
+
+                        # Create skill card
+                        st.markdown(f"""
+                        <div class="skill-card">
+                            <h3 style="color: #00695C; margin-top: 0;">{skill_name}</h3>
+                            <div class="level-path">
+                                <div class="level-connector{'completed' if current_idx > 0 else ''}"></div>
+                        """, unsafe_allow_html=True)
+
+                        # Create level steps
+                        level_cols = st.columns(4)
+                        for idx, (level, emoji) in enumerate(zip(levels, level_emojis.values())):
+                            with level_cols[idx]:
+                                if idx < current_idx:
+                                    status_class = "completed"
+                                    status_text = "✓"
+                                elif idx == current_idx:
+                                    status_class = "current"
+                                    status_text = emoji
+                                else:
+                                    status_class = "locked"
+                                    status_text = "🔒"
+
+                                st.markdown(f"""
+                                <div style="text-align: center;">
+                                    <div class="level-step {status_class}">{status_text}</div>
+                                    <div class="level-label">{level[:3]}</div>
+                                </div>
+                                """, unsafe_allow_html=True)
+
+                        st.markdown("</div></div>", unsafe_allow_html=True)
+
+    # Navigation (outside both view modes)
     st.markdown("---")
     col1, col2 = st.columns(2)
 

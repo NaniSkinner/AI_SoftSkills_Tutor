@@ -1,0 +1,100 @@
+{
+  "progression_icons": {
+    "Emerging": {
+      "icon": "🌱",
+      "label": "Emerging",
+      "description": "Just beginning - growing like a little plant!",
+      "color": "#81C784",
+      "medalType": "plant"
+    },
+    "Developing": {
+      "icon": "🥉",
+      "label": "Developing",
+      "description": "Making progress - earned a Bronze medal!",
+      "color": "#CD7F32",
+      "medalType": "bronze"
+    },
+    "Proficient": {
+      "icon": "🥈",
+      "label": "Proficient",
+      "description": "Doing great - earned a Silver medal!",
+      "color": "#C0C0C0",
+      "medalType": "silver"
+    },
+    "Advanced": {
+      "icon": "🥇",
+      "label": "Advanced",
+      "description": "Expert level - earned a Gold medal!",
+      "color": "#FFD700",
+      "medalType": "gold"
+    }
+  },
+  "category_colors": {
+    "SEL": {
+      "name": "Social-Emotional Learning",
+      "primary": "#FFE0B2",
+      "secondary": "#FF9800",
+      "accent": "#E65100",
+      "gradient": "linear-gradient(135deg, #FFE0B2 0%, #FFCC80 100%)",
+      "pathColor": "#FFA726"
+    },
+    "EF": {
+      "name": "Executive Function",
+      "primary": "#E1BEE7",
+      "secondary": "#9C27B0",
+      "accent": "#4A148C",
+      "gradient": "linear-gradient(135deg, #E1BEE7 0%, #CE93D8 100%)",
+      "pathColor": "#AB47BC"
+    },
+    "21st Century": {
+      "name": "21st Century Skills",
+      "primary": "#B2DFDB",
+      "secondary": "#00897B",
+      "accent": "#004D40",
+      "gradient": "linear-gradient(135deg, #B2DFDB 0%, #80CBC4 100%)",
+      "pathColor": "#26A69A"
+    }
+  },
+  "skill_categories": {
+    "Self-Awareness": "SEL",
+    "Self-Management": "SEL",
+    "Social Awareness": "SEL",
+    "Relationship Skills": "SEL",
+    "Responsible Decision-Making": "SEL",
+    "Working Memory": "EF",
+    "Inhibitory Control": "EF",
+    "Cognitive Flexibility": "EF",
+    "Planning & Prioritization": "EF",
+    "Organization": "EF",
+    "Task Initiation": "EF",
+    "Critical Thinking": "21st Century",
+    "Communication": "21st Century",
+    "Collaboration": "21st Century",
+    "Creativity & Innovation": "21st Century",
+    "Digital Literacy": "21st Century",
+    "Global Awareness": "21st Century"
+  },
+  "decorative_elements": {
+    "clouds": ["☁️", "🌥️"],
+    "nature": ["🌸", "🌼", "🌺", "🦋", "🐝"],
+    "stars": ["⭐", "✨", "🌟"],
+    "celebration": ["🎉", "🎊", "🎈", "✨"]
+  },
+  "path_styles": {
+    "default": {
+      "strokeWidth": 4,
+      "strokeDasharray": "10,5",
+      "opacity": 0.7
+    },
+    "active": {
+      "strokeWidth": 6,
+      "strokeDasharray": "none",
+      "opacity": 1.0
+    },
+    "completed": {
+      "strokeWidth": 5,
+      "strokeDasharray": "none",
+      "opacity": 0.9
+    }
+  }
+}

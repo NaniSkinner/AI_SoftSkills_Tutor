@@ -196,26 +196,47 @@ try:
             st.markdown("---")
             st.markdown(f"### 🎨 Awesome, {student['name']}! Pick your avatar:")
 
-            # Avatar styles using DiceBear API
-            # Fixed avatars (same for all students, no descriptive names)
+            # Avatar options with local images
+            import base64
+            from pathlib import Path
+
+            def get_image_base64(img_path):
+                """Convert image to base64 for embedding"""
+                with open(img_path, "rb") as f:
+                    return base64.b64encode(f.read()).decode()
+
+            assets_path = Path(__file__).parent.parent / "assets" / "avatars"
+
             avatar_styles = [
                 {
-                    "name": "Avatar1",
-                    "url": "https://api.dicebear.com/7.x/bottts/svg?seed=Ryan&backgroundColor=757575"
+                    "name": "Boy",
+                    "file": "avatar1.png",
+                    "path": assets_path / "avatar1.png"
                 },
                 {
-                    "name": "Avatar2",
-                    "url": "https://api.dicebear.com/7.x/adventurer/svg?seed=Kingston&backgroundColor=7FA99B"
+                    "name": "Girl",
+                    "file": "avatar2.png",
+                    "path": assets_path / "avatar2.png"
                 },
                 {
-                    "name": "Avatar3",
-                    "url": "https://api.dicebear.com/7.x/adventurer/svg?seed=Liam&backgroundColor=E8C5A5"
+                    "name": "Robot",
+                    "file": "avatar3.png",
+                    "path": assets_path / "avatar3.png"
                 },
                 {
-                    "name": "Avatar4",
-                    "url": "https://api.dicebear.com/7.x/adventurer/svg?seed=Avery&backgroundColor=C9B8A8"
+                    "name": "Axolotl",
+                    "file": "avatar4.png",
+                    "path": assets_path / "avatar4.png"
                 }
             ]
+
+            # Convert images to base64 for embedding
+            for avatar in avatar_styles:
+                if avatar['path'].exists():
+                    avatar['url'] = f"data:image/png;base64,{get_image_base64(avatar['path'])}"
+                else:
+                    st.error(f"Avatar image not found: {avatar['path']}")
+                    avatar['url'] = ""
 
             # Display avatars in columns
             cols = st.columns(4)
@@ -237,6 +258,7 @@ try:
                     if st.button("Select", key=f"avatar_{idx}", type="primary"):
                         st.session_state.selected_avatar = avatar['name']
                         st.session_state.avatar_url = avatar['url']
+                        st.session_state.avatar_file = avatar['file']  # Store filename for later use
                         st.rerun()
 
             # Show start button if avatar selected
