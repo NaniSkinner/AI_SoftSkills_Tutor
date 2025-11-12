@@ -265,10 +265,10 @@
         /* Student Avatar on Path */
         .student-avatar {
             position: absolute;
-            width: 80px;
-            height: 80px;
+            width: 160px;  /* 2x bigger (was 80px) */
+            height: 160px; /* 2x bigger (was 80px) */
             z-index: 100;
-            animation: avatar-float 3s ease-in-out infinite;
+            animation: avatar-sway 2.5s ease-in-out infinite;
             filter: drop-shadow(4px 4px 6px rgba(0, 0, 0, 0.3));
         }
 
@@ -278,9 +278,10 @@
             object-fit: contain;
         }
 
-        @keyframes avatar-float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+        /* Side-to-side swaying animation */
+        @keyframes avatar-sway {
+            0%, 100% { transform: translateX(-8px) rotate(-3deg); }
+            50% { transform: translateX(8px) rotate(3deg); }
         }
 
         /* Zoom Controls */
@@ -408,8 +409,8 @@
             }
 
             .student-avatar {
-                width: 60px;
-                height: 60px;
+                width: 120px;  /* 2x bigger for mobile (was 60px) */
+                height: 120px; /* 2x bigger for mobile (was 60px) */
             }
 
             .legend {
@@ -552,29 +553,38 @@
                     });
                     setSkills(transformedSkills);
 
-                    // Calculate avatar position based on overall progress
-                    const avgProgress = transformedSkills.reduce((sum, s) => {
-                        const levelMap = { 'Emerging': 0, 'Developing': 1, 'Proficient': 2, 'Advanced': 3 };
-                        return sum + (levelMap[s.currentLevel] || 0);
-                    }, 0) / transformedSkills.length;
+                    // Calculate avatar position based on the position of the student's cards
+                    // Find the middle card index (where most of the student's skills are)
+                    const numSkills = Math.min(transformedSkills.length, PATH_COORDINATES.length);
 
-                    // Map progress to path position
-                    const progressIndex = Math.floor(avgProgress * (PATH_COORDINATES.length / 4));
-                    const pathPos = PATH_COORDINATES[Math.min(progressIndex, PATH_COORDINATES.length - 1)];
-                    setAvatarPosition(pathPos);
+                    if (numSkills > 0) {
+                        // Position avatar at the middle of the student's skill cards
+                        const middleCardIndex = Math.floor(numSkills / 2);
+                        const pathPos = PATH_COORDINATES[middleCardIndex];
+
+                        // Offset the avatar slightly to the center of the path (between left/right cards)
+                        const avatarPos = {
+                            x: 50, // Center of the path
+                            y: pathPos.y // Same vertical position as middle card
+                        };
+                        setAvatarPosition(avatarPos);
+                    }
 
                     // Auto-zoom animation: Show full map for 3 seconds, then zoom to current position
                     // Only trigger once per session
-                    if (!hasAutoZoomed) {
+                    if (!hasAutoZoomed && numSkills > 0) {
                         setTimeout(() => {
                             setZoomLevel(1.2); // Zoom in to current level
                             setHasAutoZoomed(true);
 
                             // Pan to current position after zoom
                             if (containerRef.current && viewportRef.current) {
+                                const middleCardIndex = Math.floor(numSkills / 2);
+                                const middleCardPos = PATH_COORDINATES[middleCardIndex];
+
                                 const containerHeight = containerRef.current.offsetHeight;
                                 const viewportHeight = viewportRef.current.clientHeight;
-                                const targetY = (pathPos.y / 100) * containerHeight * 1.2; // Account for zoom
+                                const targetY = (middleCardPos.y / 100) * containerHeight * 1.2; // Account for zoom
                                 const centerY = viewportHeight / 2;
                                 const newPanY = centerY - targetY;
 
