@@ -1,20 +1,4 @@
 services:
-  # PostgreSQL Database
-  - type: pserv
-    name: flourish-skills-db
-    env: docker
-    plan: free
-    dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
-    healthCheckPath: /
-    envVars:
-      - key: POSTGRES_USER
-        value: flourish_admin
-      - key: POSTGRES_PASSWORD
-        generateValue: true
-      - key: POSTGRES_DB
-        value: skills_tracker_db
-
   # FastAPI Backend
   - type: web
     name: flourish-skills-backend
@@ -22,7 +6,7 @@ services:
     plan: free
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
-    healthCheckPath: /docs
+    healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -47,7 +31,7 @@ services:
         fromService:
           name: flourish-skills-backend
           type: web
-          property: host
+          envVarKey: RENDER_EXTERNAL_URL
 
 databases:
   - name: flourish-skills-db
