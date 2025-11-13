@@ -14,6 +14,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
+# Copy mock_data from parent directory (for data ingestion)
+COPY ../mock_data /app/mock_data
+
 # Expose port
 EXPOSE 8000
 
