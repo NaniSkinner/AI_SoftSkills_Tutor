@@ -5,7 +5,7 @@ services:
     env: docker
     plan: free
     dockerfilePath: ./backend/Dockerfile
-    dockerContext: ./backend
+    dockerContext: .
     healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
@@ -18,6 +18,10 @@ services:
         value: gpt-4o
       - key: USE_LLM_CONFIDENCE
         value: false
+      - key: ALLOWED_ORIGINS
+        value: https://flourish-skills-frontend.onrender.com,*
+      - key: ADMIN_INIT_KEY
+        value: flourish-admin-2024
 
   # Streamlit Frontend
   - type: web

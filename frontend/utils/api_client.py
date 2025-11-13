@@ -41,14 +41,22 @@ class APIClient:
             if teacher_id:
                 params["teacher_id"] = teacher_id
 
-            logger.info(f"Fetching students (teacher_id={teacher_id})")
+            logger.info(f"Fetching students from {url} (teacher_id={teacher_id})")
+            logger.info(f"Using BACKEND_URL: {BACKEND_URL}")
             response = requests.get(url, params=params, timeout=10)
             response.raise_for_status()
 
-            return response.json()
+            students = response.json()
+            logger.info(f"Successfully fetched {len(students)} students")
+            return students
 
         except requests.exceptions.RequestException as e:
-            logger.error(f"Error fetching students: {str(e)}")
+            logger.error(f"Error fetching students from {url}: {str(e)}")
+            if hasattr(e, 'response') and e.response is not None:
+                logger.error(f"Response status: {e.response.status_code}")
+                logger.error(f"Response text: {e.response.text}")
+            else:
+                logger.error("No response received - possible connection error")
             raise Exception(f"Failed to fetch students: {str(e)}")
 
     @staticmethod

@@ -3,10 +3,11 @@ Flourish Skills Tracker - Backend API
 
 Complete REST API for AI-powered soft skills assessment.
 """
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import os
 import logging
+import subprocess
 from database import test_connection
 
 # Import all routers
@@ -29,13 +30,16 @@ app = FastAPI(
 )
 
 # CORS configuration for Streamlit frontend
+# Get allowed origins from environment variable
+allowed_origins = os.getenv("ALLOWED_ORIGINS", "").split(",") if os.getenv("ALLOWED_ORIGINS") else [
+    "http://localhost:8501",
+    "http://frontend:8501",
+    "*"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:8501",  # Local Streamlit
-        "http://frontend:8501",   # Docker Streamlit
-        "*"  # Allow all for development
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -73,6 +77,71 @@ async def health_check():
         "openai_configured": bool(os.getenv("OPENAI_API_KEY")),
         "version": "1.0.0"
     }
+
+
+@app.post("/api/admin/initialize-data")
+async def initialize_data(admin_key: str):
+    """
+    One-time initialization endpoint to load mock data into the database.
+
+    This endpoint runs the data ingestion script to populate the database
+    with all student data, assessments, and related information from the
+    mock_data directory.
+
+    Args:
+        admin_key: Secret key to prevent unauthorized access
+
+    Returns:
+        Success message with data loaded count
+
+    Usage:
+        POST /api/admin/initialize-data?admin_key=your-secret-key
+    """
+    # Verify admin key
+    expected_key = os.getenv("ADMIN_INIT_KEY", "flourish-admin-2024")
+    if admin_key != expected_key:
+        logger.warning(f"Unauthorized data initialization attempt")
+        raise HTTPException(status_code=403, detail="Unauthorized - Invalid admin key")
+
+    logger.info("Starting data initialization...")
+
+    try:
+        # Run the ingestion script
+        result = subprocess.run(
+            ["python", "scripts/ingest_all_data.py", "--backend-url", "http://localhost:8000"],
+            capture_output=True,
+            text=True,
+            timeout=300,  # 5 minute timeout
+            cwd="/app"  # Ensure we're in the app directory
+        )
+
+        if result.returncode == 0:
+            logger.info("Data initialization completed successfully")
+            return {
+                "success": True,
+                "message": "Data initialization completed successfully",
+                "output": result.stdout,
+                "details": "All students and their data have been loaded into the database"
+            }
+        else:
+            logger.error(f"Data initialization failed: {result.stderr}")
+            raise HTTPException(
+                status_code=500,
+                detail=f"Data initialization failed: {result.stderr}"
+            )
+
+    except subprocess.TimeoutExpired:
+        logger.error("Data initialization timed out after 5 minutes")
+        raise HTTPException(
+            status_code=500,
+            detail="Data initialization timed out after 5 minutes"
+        )
+    except Exception as e:
+        logger.error(f"Data initialization error: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Data initialization error: {str(e)}"
+        )
 
 
 @app.on_event("startup")

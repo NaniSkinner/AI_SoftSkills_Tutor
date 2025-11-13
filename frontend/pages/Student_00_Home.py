@@ -181,6 +181,10 @@ st.markdown('<p class="subtitle">Let\'s explore how amazing you are!</p>', unsaf
 # Step 1: Select student
 st.markdown("### 👋 First, who are you?")
 
+# Debug: Log backend URL being used
+backend_url = os.getenv("BACKEND_URL", "http://backend:8000")
+logger.info(f"Using BACKEND_URL: {backend_url}")
+
 try:
     students = APIClient.get_students()
 
