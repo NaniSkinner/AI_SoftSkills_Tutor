@@ -1,0 +1,56 @@
+services:
+  # PostgreSQL Database
+  - type: pserv
+    name: flourish-skills-db
+    env: docker
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /
+    envVars:
+      - key: POSTGRES_USER
+        value: flourish_admin
+      - key: POSTGRES_PASSWORD
+        generateValue: true
+      - key: POSTGRES_DB
+        value: skills_tracker_db
+
+  # FastAPI Backend
+  - type: web
+    name: flourish-skills-backend
+    env: docker
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /docs
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: flourish-skills-db
+          property: connectionString
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4o
+      - key: USE_LLM_CONFIDENCE
+        value: false
+
+  # Streamlit Frontend
+  - type: web
+    name: flourish-skills-frontend
+    env: docker
+    plan: free
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    envVars:
+      - key: BACKEND_URL
+        fromService:
+          name: flourish-skills-backend
+          type: web
+          property: host
+
+databases:
+  - name: flourish-skills-db
+    databaseName: skills_tracker_db
+    user: flourish_admin
+    plan: free
