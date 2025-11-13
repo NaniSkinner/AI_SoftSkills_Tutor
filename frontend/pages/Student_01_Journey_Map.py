@@ -403,6 +403,37 @@ try:
             "21st Century Skills": "category-21st"
         }
 
+        # Child-friendly skill descriptions
+        skill_descriptions = {
+            "Empathy": "Understanding and caring about how others feel",
+            "Self-Awareness": "Knowing your feelings, strengths, and what you need to work on",
+            "Social Awareness": "Noticing and understanding what's happening around you with other people",
+            "Relationship Skills": "Making friends, working with others, and solving problems together",
+            "Responsible Decision Making": "Making good choices by thinking about what might happen",
+            "Self-Management": "Controlling your feelings and actions to reach your goals",
+            "Working Memory": "Remembering information while you use it to do something",
+            "Cognitive Flexibility": "Being able to switch between different tasks or ways of thinking",
+            "Inhibitory Control": "Stopping yourself from doing things you shouldn't do",
+            "Planning": "Thinking ahead about how to do something before you start",
+            "Organization": "Keeping your things and ideas in order so you can find them",
+            "Time Management": "Using your time wisely to get things done",
+            "Task Initiation": "Starting your work without waiting or putting it off",
+            "Persistence": "Keeping going even when something is hard or takes a long time",
+            "Metacognition": "Thinking about your own thinking and how you learn",
+            "Emotional Control": "Managing your feelings so they don't control you",
+            "Stress Tolerance": "Staying calm and handling pressure when things get tough",
+            "Creativity": "Coming up with new and interesting ideas or ways to do things",
+            "Critical Thinking": "Thinking carefully about information before deciding what to believe",
+            "Collaboration": "Working together with others to get something done",
+            "Communication": "Sharing your ideas clearly so others can understand you",
+            "Digital Literacy": "Knowing how to use technology safely and smartly",
+            "Global Citizenship": "Understanding and caring about people all around the world",
+            "Media Literacy": "Understanding messages in videos, news, and social media",
+            "Leadership": "Helping and guiding others to work together toward a goal",
+            "Adaptability": "Adjusting to changes and new situations without getting upset",
+            "Initiative": "Starting to do things on your own without being told"
+        }
+
         for category_name, skills in skills_by_category.items():
             if skills:
                 icon = category_icons.get(category_name, "⭐")
@@ -427,12 +458,16 @@ try:
                         level_emojis = {'Emerging': '🌱', 'Developing': '🌿', 'Proficient': '🌳', 'Advanced': '🏆'}
                         current_idx = levels.index(current_level_full) if current_level_full in levels else 0
 
+                        # Get skill description
+                        description = skill_descriptions.get(skill_name, "A skill that helps you grow and learn")
+
                         # Create skill card
                         st.markdown(f"""
                         <div class="skill-card">
                             <h3 style="color: #00695C; margin-top: 0;">{skill_name}</h3>
+                            <p style="color: #00897B; font-size: 1.1rem; margin: 0.5rem 0 1rem 0; font-style: italic;">{description}</p>
                             <div class="level-path">
-                                <div class="level-connector{'completed' if current_idx > 0 else ''}"></div>
+                                <div class="level-connector{' completed' if current_idx > 0 else ''}"></div>
                         """, unsafe_allow_html=True)
 
                         # Create level steps
