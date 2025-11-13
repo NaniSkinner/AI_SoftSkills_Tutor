@@ -8,14 +8,14 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for caching
-COPY requirements.txt .
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY . .
+COPY backend/ .
 
-# Copy mock_data from parent directory (for data ingestion)
-COPY ../mock_data /app/mock_data
+# Copy mock_data for data ingestion
+COPY mock_data /app/mock_data
 
 # Expose port
 EXPOSE 8000
