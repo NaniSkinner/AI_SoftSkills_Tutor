@@ -1,7 +1,13 @@
 import streamlit as st
 import sys
+import os
+import logging
 from pathlib import Path
 from st_clickable_images import clickable_images
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Add utils to path
 sys.path.insert(0, str(Path(__file__).parent))
