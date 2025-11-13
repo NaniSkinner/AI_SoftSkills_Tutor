@@ -1,6 +1,7 @@
 import streamlit as st
 import sys
 from pathlib import Path
+from st_clickable_images import clickable_images
 
 # Add utils to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -76,6 +77,12 @@ st.markdown("""
         border: 4px solid #7FA99B;
         background: #FFF8E7;
         box-shadow: 12px 12px 0px #5D4E37;
+    }
+
+    /* Style for clickable avatar images */
+    .clickable-images img:hover {
+        transform: scale(1.1) !important;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.2) !important;
     }
 
     /* Avatar image */
@@ -238,45 +245,23 @@ try:
                     st.error(f"Avatar image not found: {avatar['path']}")
                     avatar['url'] = ""
 
-            # Display avatars in columns
-            cols = st.columns(4)
+            # Display clickable avatars
+            avatar_urls = [avatar['url'] for avatar in avatar_styles]
 
-            for idx, (col, avatar) in enumerate(zip(cols, avatar_styles)):
-                with col:
-                    # Check if this is the selected avatar
-                    is_selected = st.session_state.selected_avatar == avatar['name']
-                    card_class = "avatar-card selected" if is_selected else "avatar-card"
+            clicked = clickable_images(
+                avatar_urls,
+                titles=[f"Select {avatar['name']}" for avatar in avatar_styles],
+                div_style={"display": "flex", "justify-content": "center", "flex-wrap": "wrap", "gap": "20px"},
+                img_style={"width": "150px", "height": "150px", "border-radius": "50%", "border": "3px solid #E8C5A5", "cursor": "pointer", "transition": "transform 0.3s ease"}
+            )
 
-                    # Avatar card (no name/description displayed)
-                    st.markdown(f"""
-                    <div class="{card_class}" onclick="document.getElementById('avatar_{idx}').click()">
-                        <img src="{avatar['url']}" class="avatar-img" alt="Avatar {idx + 1}">
-                    </div>
-                    """, unsafe_allow_html=True)
-
-                    # Hidden button for selection
-                    if st.button("Select", key=f"avatar_{idx}", type="primary"):
-                        st.session_state.selected_avatar = avatar['name']
-                        st.session_state.avatar_url = avatar['url']
-                        st.session_state.avatar_file = avatar['file']  # Store filename for later use
-                        st.rerun()
-
-            # Show start button if avatar selected
-            if st.session_state.selected_avatar:
-                st.markdown("---")
-
-                st.markdown("""
-                <div class="info-box">
-                    <strong>Avatar selected!</strong>
-                    <br>
-                    Ready to see how you're growing? 🌱
-                </div>
-                """, unsafe_allow_html=True)
-
-                col1, col2, col3 = st.columns([1, 2, 1])
-                with col2:
-                    if st.button("🚀 Start My Journey!", key="start_journey", use_container_width=True):
-                        st.switch_page("pages/Student_01_Journey_Map.py")
+            # Handle avatar click
+            if clicked > -1:
+                # Save avatar selection and go directly to dashboard
+                st.session_state.selected_avatar = avatar_styles[clicked]['name']
+                st.session_state.avatar_url = avatar_styles[clicked]['url']
+                st.session_state.avatar_file = avatar_styles[clicked]['file']
+                st.switch_page("pages/Student_01_Journey_Map.py")
         else:
             st.markdown("""
             <div class="info-box">
