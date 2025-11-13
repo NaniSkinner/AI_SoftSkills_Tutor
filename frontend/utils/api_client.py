@@ -78,6 +78,30 @@ class APIClient:
             logger.error(f"Error fetching student progress: {str(e)}")
             raise Exception(f"Failed to fetch student progress: {str(e)}")
 
+    @staticmethod
+    def get_active_skills_progress(student_id: str) -> List[Dict[str, Any]]:
+        """
+        Get current proficiency levels for all active targeted skills.
+
+        Args:
+            student_id: Student ID
+
+        Returns:
+            List of active skill progress dictionaries with current and target levels
+        """
+        try:
+            url = f"{BACKEND_URL}/api/students/{student_id}/active-skills-progress"
+
+            logger.info(f"Fetching active skills progress for student {student_id}")
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+
+            return response.json()
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error fetching active skills progress: {str(e)}")
+            raise Exception(f"Failed to fetch active skills progress: {str(e)}")
+
     # ================== Assessments Methods ==================
 
     @staticmethod

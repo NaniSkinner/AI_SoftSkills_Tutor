@@ -92,15 +92,15 @@ with nav_col2:
 
 st.markdown("---")
 
-# Fetch skill trends
+# Fetch active skills progress
 try:
-    with st.spinner(f"Loading skill trends for {student_name}..."):
-        skill_trends = APIClient.get_skill_trends(selected_student)
+    with st.spinner(f"Loading active skills progress for {student_name}..."):
+        active_skills = APIClient.get_active_skills_progress(selected_student)
         progress = APIClient.get_student_progress(selected_student)
 
-    if not skill_trends:
-        st.warning(f"No assessment data found for {student_name}")
-        st.info("Data will appear once assessments are generated for this student.")
+    if not active_skills:
+        st.warning(f"No active skill targets found for {student_name}")
+        st.info("Assign skill targets to this student to see their progress here.")
         st.stop()
 
     # Display progress summary
@@ -119,143 +119,107 @@ try:
 
     st.markdown("---")
 
-    # Group skills by category
-    skill_categories = {
-        "SEL": [],
-        "EF": [],
-        "21st Century": []
+    # Active Skills Progress Chart
+    st.markdown("### 📊 Active Skills Progress")
+    st.markdown("*Showing current proficiency levels for all active skill targets*")
+
+    # Prepare data for horizontal bar chart
+    skill_names = [skill["skill_name"] for skill in active_skills]
+    current_levels = [skill["current_level_numeric"] for skill in active_skills]
+    current_level_text = [skill["current_level"] for skill in active_skills]
+    target_levels = [skill["target_level_numeric"] for skill in active_skills]
+    target_level_text = [skill["target_level"] for skill in active_skills]
+
+    # Define color mapping for proficiency levels
+    level_colors = {
+        1: '#fbbf24',  # Emerging - Yellow
+        2: '#fb923c',  # Developing - Orange
+        3: '#60a5fa',  # Proficient - Blue
+        4: '#34d399'   # Advanced - Green
     }
 
-    for skill_trend in skill_trends:
-        category = skill_trend["skill_category"]
-        if category in skill_categories:
-            skill_categories[category].append(skill_trend)
+    # Create bar colors based on current level
+    bar_colors = [level_colors.get(level, '#9ca3af') for level in current_levels]
 
-    # Display skills by category
-    st.markdown("### 📚 Skills by Category")
+    # Create horizontal bar chart
+    fig = go.Figure()
 
-    for category, skills in skill_categories.items():
-        if not skills:
-            continue
+    # Add current level bars
+    fig.add_trace(go.Bar(
+        y=skill_names,
+        x=current_levels,
+        orientation='h',
+        name='Current Level',
+        marker=dict(
+            color=bar_colors,
+            line=dict(color='#374151', width=1)
+        ),
+        text=current_level_text,
+        textposition='auto',
+        hovertemplate="<b>%{y}</b><br>Current: %{text}<br>Level: %{x}<extra></extra>"
+    ))
 
-        with st.expander(f"**{category}** ({len(skills)} skills)", expanded=(category == "SEL")):
-            for skill in skills:
-                skill_name = skill["skill_name"]
-                assessments = skill["assessments"]
+    # Add target level markers
+    fig.add_trace(go.Scatter(
+        y=skill_names,
+        x=target_levels,
+        mode='markers',
+        name='Target Level',
+        marker=dict(
+            symbol='diamond',
+            size=14,
+            color='#ef4444',
+            line=dict(color='#7f1d1d', width=2)
+        ),
+        text=target_level_text,
+        hovertemplate="<b>%{y}</b><br>Target: %{text}<br>Level: %{x}<extra></extra>"
+    ))
 
-                if not assessments:
-                    continue
-
-                # Get latest assessment
-                latest = assessments[-1]
-                current_level = latest["level"]
-
-                # Create mini timeline
-                col_skill, col_timeline, col_date = st.columns([2, 3, 2])
-
-                with col_skill:
-                    st.markdown(f"**{skill_name}**")
-
-                with col_timeline:
-                    # Show progression
-                    levels_seen = list(set([a["level"] for a in assessments]))
-                    level_order = ["Emerging", "Developing", "Proficient", "Advanced"]
-                    ordered_levels = [l for l in level_order if l in levels_seen]
-
-                    timeline_html = " → ".join([
-                        f"<span style='color: {get_progress_color(l)}; font-weight: bold;'>{l[0]}</span>"
-                        for l in ordered_levels
-                    ])
-                    st.markdown(timeline_html, unsafe_allow_html=True)
-
-                with col_date:
-                    latest_date = latest["date"]
-                    st.markdown(f"*{latest_date}*")
-
-    st.markdown("---")
-
-    # Detailed skill chart
-    st.markdown("### 📊 Detailed Skill Chart")
-
-    # Skill selector
-    skill_names = [s["skill_name"] for s in skill_trends]
-    selected_skill = st.selectbox(
-        "Select a skill to view detailed progression",
-        options=skill_names,
-        key="skill_chart_selector"
+    # Update layout
+    fig.update_layout(
+        title=f"{student_name}'s Active Skill Targets Progress",
+        xaxis_title="Proficiency Level",
+        yaxis_title="",
+        xaxis=dict(
+            tickmode='array',
+            tickvals=[1, 2, 3, 4],
+            ticktext=["Emerging", "Developing", "Proficient", "Advanced"],
+            range=[0, 4.5]
+        ),
+        height=max(400, len(skill_names) * 60),  # Dynamic height based on number of skills
+        showlegend=True,
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=1.02,
+            xanchor="right",
+            x=1
+        ),
+        hovermode='closest',
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)'
     )
 
-    # Find selected skill data
-    selected_skill_data = next(
-        (s for s in skill_trends if s["skill_name"] == selected_skill),
-        None
-    )
+    # Add gridlines
+    fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='lightgray')
+    fig.update_yaxes(showgrid=False)
 
-    if selected_skill_data:
-        assessments = selected_skill_data["assessments"]
+    st.plotly_chart(fig, use_container_width=True)
 
-        # Prepare chart data
-        dates = [a["date"] for a in assessments]
-        levels_numeric = [a["level_numeric"] for a in assessments]
-        levels_text = [a["level"] for a in assessments]
-        confidences = [float(a["confidence"]) for a in assessments]
+    # Skills summary table
+    st.markdown("#### Skills Summary")
 
-        # Create Plotly chart
-        fig = go.Figure()
+    summary_data = []
+    for skill in active_skills:
+        summary_data.append({
+            "Skill": skill["skill_name"],
+            "Category": skill["skill_category"],
+            "Current Level": skill["current_level"],
+            "Target Level": skill["target_level"]
+        })
 
-        # Add line and markers with Flourish green color
-        fig.add_trace(go.Scatter(
-            x=dates,
-            y=levels_numeric,
-            mode='lines+markers',
-            name=selected_skill,
-            line=dict(color='#3a5a44', width=3),
-            marker=dict(
-                size=12,
-                color=confidences,
-                colorscale='YlGn',
-                showscale=True,
-                colorbar=dict(title="Confidence"),
-                cmin=0.0,
-                cmax=1.0
-            ),
-            text=levels_text,
-            hovertemplate="<b>%{text}</b><br>Date: %{x}<br>Confidence: %{marker.color:.2f}<extra></extra>"
-        ))
-
-        # Update layout
-        fig.update_layout(
-            title=f"{selected_skill} Progression Over Time",
-            xaxis_title="Date",
-            yaxis_title="Proficiency Level",
-            yaxis=dict(
-                tickmode='array',
-                tickvals=[1, 2, 3, 4],
-                ticktext=["Emerging", "Developing", "Proficient", "Advanced"],
-                range=[0.5, 4.5]
-            ),
-            hovermode='x unified',
-            height=500
-        )
-
-        st.plotly_chart(fig, use_container_width=True)
-
-        # Recent assessments table
-        st.markdown(f"#### Recent Assessments for {selected_skill}")
-
-        # Show last 5 assessments
-        recent_assessments = assessments[-5:]
-
-        assessment_data = []
-        for a in reversed(recent_assessments):
-            assessment_data.append({
-                "Date": a["date"],
-                "Level": a["level"],
-                "Confidence": f"{float(a['confidence']):.2f}"
-            })
-
-        df = pd.DataFrame(assessment_data)
-        st.dataframe(df, use_container_width=True, hide_index=True)
+    df = pd.DataFrame(summary_data)
+    st.dataframe(df, use_container_width=True, hide_index=True)
 
     st.markdown("---")
 
@@ -281,35 +245,31 @@ try:
     st.markdown("### 💾 Download Data")
 
     # Prepare CSV data
-    all_assessment_data = []
-    for skill_trend in skill_trends:
-        skill_name = skill_trend["skill_name"]
-        category = skill_trend["skill_category"]
+    download_data = []
+    for skill in active_skills:
+        download_data.append({
+            "Student": student_name,
+            "Skill": skill["skill_name"],
+            "Category": skill["skill_category"],
+            "Current_Level": skill["current_level"],
+            "Current_Level_Numeric": skill["current_level_numeric"],
+            "Target_Level": skill["target_level"],
+            "Target_Level_Numeric": skill["target_level_numeric"]
+        })
 
-        for a in skill_trend["assessments"]:
-            all_assessment_data.append({
-                "Student": student_name,
-                "Skill": skill_name,
-                "Category": category,
-                "Date": a["date"],
-                "Level": a["level"],
-                "Level_Numeric": a["level_numeric"],
-                "Confidence": a["confidence"]
-            })
-
-    if all_assessment_data:
-        df_download = pd.DataFrame(all_assessment_data)
+    if download_data:
+        df_download = pd.DataFrame(download_data)
         csv = df_download.to_csv(index=False)
 
         st.download_button(
-            label="📥 Download All Skill Trends (CSV)",
+            label="📥 Download Active Skills Progress (CSV)",
             data=csv,
-            file_name=f"{student_name.replace(' ', '_')}_skill_trends.csv",
+            file_name=f"{student_name.replace(' ', '_')}_active_skills_progress.csv",
             mime="text/csv"
         )
 
 except Exception as e:
-    st.error(f"❌ Error loading skill trends: {str(e)}")
+    st.error(f"❌ Error loading active skills progress: {str(e)}")
     st.info("💡 Make sure the backend API is running and accessible.")
 
     if st.button("🔄 Retry"):

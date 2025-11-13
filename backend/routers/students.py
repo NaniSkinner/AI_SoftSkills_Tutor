@@ -6,8 +6,9 @@ Handles student data, progress tracking, and skill target management.
 
 from fastapi import APIRouter, HTTPException, Query
 from models.schemas import (
-    StudentResponse, StudentProgressResponse, 
-    TargetAssignmentRequest, TargetResponse
+    StudentResponse, StudentProgressResponse,
+    TargetAssignmentRequest, TargetResponse,
+    ActiveSkillProgressResponse
 )
 from database.connection import get_db_connection
 from typing import List, Optional, Dict, Any
@@ -342,21 +343,124 @@ async def complete_target(target_id: int):
         conn.commit()
         
         logger.info(f"Target {target_id} marked as completed")
-        
+
         return {
             "success": True,
             "message": f"Target {target_id} completed successfully"
         }
-        
+
     except HTTPException:
         raise
-    
+
     except Exception as e:
         if conn:
             conn.rollback()
         logger.error(f"Error completing target: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Failed to complete target: {str(e)}")
-    
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+
+@router.get("/{student_id}/active-skills-progress", response_model=List[ActiveSkillProgressResponse])
+async def get_active_skills_progress(student_id: str):
+    """
+    Get current proficiency levels for all active targeted skills
+
+    Returns the average/most recent proficiency level for each skill that has
+    an active (not completed) target assigned to the student.
+
+    Args:
+        student_id: Student ID
+
+    Returns:
+        List of ActiveSkillProgressResponse objects with current and target levels
+    """
+    conn = None
+    cursor = None
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Get active targets with current proficiency levels
+        query = """
+            WITH recent_assessments AS (
+                SELECT
+                    a.skill_name,
+                    a.skill_category,
+                    a.level,
+                    de.date,
+                    ROW_NUMBER() OVER (PARTITION BY a.skill_name ORDER BY de.date DESC) as rn
+                FROM assessments a
+                JOIN data_entries de ON a.data_entry_id = de.id
+                WHERE a.student_id = %s
+            ),
+            avg_levels AS (
+                SELECT
+                    skill_name,
+                    skill_category,
+                    CASE
+                        WHEN level = 'E' THEN 'Emerging'
+                        WHEN level = 'D' THEN 'Developing'
+                        WHEN level = 'P' THEN 'Proficient'
+                        WHEN level = 'A' THEN 'Advanced'
+                        ELSE level
+                    END as current_level,
+                    CASE
+                        WHEN level IN ('Emerging', 'E') THEN 1
+                        WHEN level IN ('Developing', 'D') THEN 2
+                        WHEN level IN ('Proficient', 'P') THEN 3
+                        WHEN level IN ('Advanced', 'A') THEN 4
+                        ELSE 0
+                    END as current_level_numeric
+                FROM recent_assessments
+                WHERE rn = 1
+            )
+            SELECT
+                st.skill_name,
+                COALESCE(al.skill_category, 'Unknown') as skill_category,
+                st.target_level,
+                COALESCE(al.current_level, st.starting_level) as current_level,
+                COALESCE(al.current_level_numeric,
+                    CASE
+                        WHEN st.starting_level = 'Emerging' THEN 1
+                        WHEN st.starting_level = 'Developing' THEN 2
+                        WHEN st.starting_level = 'Proficient' THEN 3
+                        WHEN st.starting_level = 'Advanced' THEN 4
+                        ELSE 0
+                    END
+                ) as current_level_numeric,
+                CASE
+                    WHEN st.target_level = 'Emerging' THEN 1
+                    WHEN st.target_level = 'Developing' THEN 2
+                    WHEN st.target_level = 'Proficient' THEN 3
+                    WHEN st.target_level = 'Advanced' THEN 4
+                    ELSE 0
+                END as target_level_numeric
+            FROM skill_targets st
+            LEFT JOIN avg_levels al ON st.skill_name = al.skill_name
+            WHERE st.student_id = %s AND st.completed = FALSE
+            ORDER BY st.skill_name ASC
+        """
+
+        cursor.execute(query, (student_id, student_id))
+        results = cursor.fetchall()
+
+        progress = [
+            ActiveSkillProgressResponse(**dict(row)) for row in results
+        ]
+
+        logger.info(f"Retrieved progress for {len(progress)} active skills for student {student_id}")
+        return progress
+
+    except Exception as e:
+        logger.error(f"Error retrieving active skills progress: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve active skills progress: {str(e)}")
+
     finally:
         if cursor:
             cursor.close()

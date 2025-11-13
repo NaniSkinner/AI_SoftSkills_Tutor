@@ -94,6 +94,18 @@ class SkillTrendResponse(BaseModel):
     assessments: List[Dict[str, Any]]  # [{date, level, level_numeric, confidence}, ...]
 
 
+class ActiveSkillProgressResponse(BaseModel):
+    """
+    Response schema for active targeted skills with current proficiency levels
+    """
+    skill_name: str
+    skill_category: str
+    target_level: str
+    current_level: str
+    current_level_numeric: int  # 1=Emerging, 2=Developing, 3=Proficient, 4=Advanced
+    target_level_numeric: int
+
+
 # ============================================================================
 # CORRECTION SCHEMAS
 # ============================================================================
