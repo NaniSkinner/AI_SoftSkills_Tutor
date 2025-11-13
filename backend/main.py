@@ -106,9 +106,9 @@ async def initialize_data(admin_key: str):
     logger.info("Starting data initialization...")
 
     try:
-        # Run the ingestion script
+        # Run the ingestion script with auto-confirm flag for non-interactive execution
         result = subprocess.run(
-            ["python", "scripts/ingest_all_data.py", "--backend-url", "http://localhost:8000"],
+            ["python", "scripts/ingest_all_data.py", "--backend-url", "http://localhost:8000", "--auto-confirm"],
             capture_output=True,
             text=True,
             timeout=300,  # 5 minute timeout

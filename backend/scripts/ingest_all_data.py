@@ -250,7 +250,7 @@ def ingest_single_entry(entry: Dict, backend_url: str, retry_count: int = 0) -> 
         return {"success": False, "error": "exception", "message": str(e)}
 
 
-def ingest_all(backend_url: str, dry_run: bool = False) -> Dict:
+def ingest_all(backend_url: str, dry_run: bool = False, auto_confirm: bool = False) -> Dict:
     """
     Ingest all data entries
 
@@ -283,11 +283,14 @@ def ingest_all(backend_url: str, dry_run: bool = False) -> Dict:
         logger.info(f"\nTotal: {len(data_entries)} entries")
         return {"success": True, "dry_run": True, "total_entries": len(data_entries)}
 
-    # Confirm before proceeding
-    confirm = input(f"\nProceed with ingestion of {len(data_entries)} entries? (yes/no): ")
-    if confirm.lower() not in ['yes', 'y']:
-        logger.info("Ingestion cancelled by user")
-        return {"success": False, "error": "user_cancelled"}
+    # Confirm before proceeding (skip if auto_confirm is True)
+    if not auto_confirm:
+        confirm = input(f"\nProceed with ingestion of {len(data_entries)} entries? (yes/no): ")
+        if confirm.lower() not in ['yes', 'y']:
+            logger.info("Ingestion cancelled by user")
+            return {"success": False, "error": "user_cancelled"}
+    else:
+        logger.info(f"Auto-confirm enabled - proceeding with ingestion of {len(data_entries)} entries")
 
     # Ingest all entries
     results = []
@@ -358,6 +361,11 @@ def main():
         action='store_true',
         help='List entries without ingesting'
     )
+    parser.add_argument(
+        '--auto-confirm',
+        action='store_true',
+        help='Skip interactive confirmation prompt (for API/automation use)'
+    )
 
     args = parser.parse_args()
 
@@ -374,7 +382,7 @@ def main():
         sys.exit(1)
 
     # Run ingestion
-    summary = ingest_all(args.backend_url, args.dry_run)
+    summary = ingest_all(args.backend_url, args.dry_run, args.auto_confirm)
 
     # Exit with appropriate code
     if summary.get('success', False):
