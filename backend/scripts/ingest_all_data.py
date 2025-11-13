@@ -369,9 +369,9 @@ def main():
 
     args = parser.parse_args()
 
-    # Test backend connectivity
+    # Test backend connectivity with longer timeout for Render deployment
     try:
-        response = requests.get(f"{args.backend_url}/health", timeout=5)
+        response = requests.get(f"{args.backend_url}/health", timeout=30)
         if response.status_code == 200:
             logger.info(f"✅ Backend connected: {args.backend_url}")
         else:
