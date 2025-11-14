@@ -16,6 +16,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Works with dockerContext: . (root) - copies from backend/
 COPY backend/ .
 
+# Copy mock_data directory from project root for data initialization
+# Works with dockerContext: . (root) - copies from mock_data/
+COPY mock_data/ /app/mock_data/
+
 # Expose port
 EXPOSE 8000
 

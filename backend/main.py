@@ -124,10 +124,12 @@ async def initialize_data(admin_key: str):
                 "details": "All students and their data have been loaded into the database"
             }
         else:
-            logger.error(f"Data initialization failed: {result.stderr}")
+            # Provide meaningful error message even if stderr is empty
+            error_msg = result.stderr or result.stdout or "Script failed with no output"
+            logger.error(f"Data initialization failed: {error_msg}")
             raise HTTPException(
                 status_code=500,
-                detail=f"Data initialization failed: {result.stderr}"
+                detail=f"Data initialization failed: {error_msg}"
             )
 
     except subprocess.TimeoutExpired:

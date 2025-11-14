@@ -28,6 +28,7 @@ Thumbs.db
 # Documentation
 *.md
 !README.md
+!mock_data/**/*.md
 docs/
 
 # Tests
