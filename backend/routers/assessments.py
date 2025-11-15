@@ -187,8 +187,17 @@ async def get_pending_assessments(
         return assessments
         
     except Exception as e:
-        logger.error(f"Error retrieving pending assessments: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Failed to retrieve pending assessments: {str(e)}")
+        error_msg = str(e)
+        logger.error(f"Error retrieving pending assessments: {error_msg}", exc_info=True)
+
+        # Provide helpful message if database schema is not initialized
+        if "relation" in error_msg and "does not exist" in error_msg:
+            raise HTTPException(
+                status_code=500,
+                detail="Database schema not initialized. Please contact administrator."
+            )
+
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve pending assessments: {error_msg}")
     
     finally:
         if cursor:

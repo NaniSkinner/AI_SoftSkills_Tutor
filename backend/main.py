@@ -68,12 +68,48 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint with database connectivity test"""
-    db_status = "connected" if test_connection() else "disconnected"
+    """Health check endpoint with database connectivity and schema verification"""
+    from database.connection import get_db_connection
+
+    db_status = "disconnected"
+    tables_exist = False
+    student_count = 0
+    assessment_count = 0
+
+    try:
+        if test_connection():
+            db_status = "connected"
+
+            # Check if tables exist and get counts
+            conn = get_db_connection()
+            cursor = conn.cursor()
+
+            cursor.execute("""
+                SELECT EXISTS (
+                    SELECT FROM information_schema.tables
+                    WHERE table_schema = 'public' AND table_name = 'students'
+                )
+            """)
+            tables_exist = cursor.fetchone()[0]
+
+            if tables_exist:
+                cursor.execute("SELECT COUNT(*) FROM students")
+                student_count = cursor.fetchone()[0]
+
+                cursor.execute("SELECT COUNT(*) FROM assessments")
+                assessment_count = cursor.fetchone()[0]
+
+            cursor.close()
+            conn.close()
+    except Exception as e:
+        logger.error(f"Health check error: {e}")
 
     return {
-        "status": "healthy",
+        "status": "healthy" if db_status == "connected" and tables_exist else "degraded",
         "database": db_status,
+        "schema_initialized": tables_exist,
+        "students": student_count,
+        "assessments": assessment_count,
         "openai_configured": bool(os.getenv("OPENAI_API_KEY")),
         "version": "1.0.0"
     }
@@ -152,6 +188,14 @@ async def startup_event():
     logger.info("=" * 80)
     logger.info("Flourish Skills Tracker API Starting...")
     logger.info("=" * 80)
+
+    # Run database migrations first (creates schema and loads seed data if needed)
+    try:
+        from database.migrate import run_migrations
+        run_migrations()
+    except Exception as e:
+        logger.error(f"✗ Database migration failed: {e}")
+        logger.error("  Backend may not function correctly!")
 
     # Test database connection
     if test_connection():

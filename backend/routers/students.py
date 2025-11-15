@@ -60,8 +60,17 @@ async def get_students(teacher_id: Optional[str] = Query(None, description="Filt
         return students
         
     except Exception as e:
-        logger.error(f"Error retrieving students: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Failed to retrieve students: {str(e)}")
+        error_msg = str(e)
+        logger.error(f"Error retrieving students: {error_msg}", exc_info=True)
+
+        # Provide helpful message if database schema is not initialized
+        if "relation" in error_msg and "does not exist" in error_msg:
+            raise HTTPException(
+                status_code=500,
+                detail="Database schema not initialized. Please contact administrator."
+            )
+
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve students: {error_msg}")
     
     finally:
         if cursor:
