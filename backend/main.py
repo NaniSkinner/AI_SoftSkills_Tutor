@@ -195,7 +195,8 @@ async def startup_event():
         run_migrations()
     except Exception as e:
         logger.error(f"✗ Database migration failed: {e}")
-        logger.error("  Backend may not function correctly!")
+        logger.error("  Backend cannot start without a working database!")
+        raise  # Stop startup if migration fails
 
     # Test database connection
     if test_connection():
