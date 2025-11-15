@@ -12,5 +12,13 @@ COPY . .
 # Expose Streamlit port
 EXPOSE 8501
 
-# Default command (overridden by docker-compose)
-CMD ["streamlit", "run", "Home.py", "--server.port", "8501", "--server.address", "0.0.0.0"]
+# Run Streamlit with production flags
+# Note: Most settings are in .streamlit/config.toml, but these ensure production mode
+CMD ["streamlit", "run", "Home.py", \
+    "--server.port", "8501", \
+    "--server.address", "0.0.0.0", \
+    "--server.headless", "true", \
+    "--server.enableCORS", "false", \
+    "--server.enableXsrfProtection", "false", \
+    "--browser.gatherUsageStats", "false", \
+    "--server.fileWatcherType", "none"]

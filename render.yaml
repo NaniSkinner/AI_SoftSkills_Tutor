@@ -22,7 +22,7 @@ services:
       - key: USE_LLM_CONFIDENCE
         value: false
       - key: ALLOWED_ORIGINS
-        value: https://flourish-skills-frontend.onrender.com
+        value: "*"
       - key: ADMIN_INIT_KEY
         value: flourish-admin-2024
 
@@ -33,12 +33,15 @@ services:
     plan: free
     dockerfilePath: ./frontend/Dockerfile
     dockerContext: ./frontend
+    healthCheckPath: /_stcore/health
+    healthCheckInterval: 60
+    healthCheckTimeout: 30
+    healthCheckFailureThreshold: 5
     envVars:
       - key: BACKEND_URL
-        fromService:
-          name: flourish-skills-backend
-          type: web
-          envVarKey: RENDER_EXTERNAL_URL
+        value: http://flourish-skills-backend:8000
+      - key: BACKEND_TIMEOUT
+        value: "90"
 
 databases:
   - name: flourish-skills-db

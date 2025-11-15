@@ -15,6 +15,17 @@ font = "sans serif"                # Will be overridden by custom fonts in CSS
 # Server configuration
 headless = true
 port = 8501
+address = "0.0.0.0"
+
+# Disable CORS and XSRF for internal service communication on Render
+enableCORS = false
+enableXsrfProtection = false
+
+# File watcher disabled for production (reduces CPU usage)
+fileWatcherType = "none"
+
+# Increase max upload size (in MB)
+maxUploadSize = 200
 
 [browser]
 # Browser configuration
