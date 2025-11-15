@@ -6,7 +6,7 @@ Handles retrieval and viewing of skill assessments.
 
 from fastapi import APIRouter, HTTPException, Query
 from models.schemas import AssessmentResponse, SkillTrendResponse
-from database.connection import get_db_connection
+from database.connection import get_db_connection, return_db_connection
 from typing import List, Optional
 import logging
 
@@ -62,7 +62,7 @@ async def get_student_assessments(student_id: str):
         if cursor:
             cursor.close()
         if conn:
-            conn.close()
+            return_db_connection(conn)
 
 
 @router.get("/skill-trends/{student_id}", response_model=List[SkillTrendResponse])
@@ -134,7 +134,7 @@ async def get_skill_trends(student_id: str):
         if cursor:
             cursor.close()
         if conn:
-            conn.close()
+            return_db_connection(conn)
 
 
 @router.get("/pending", response_model=List[AssessmentResponse])
@@ -203,7 +203,7 @@ async def get_pending_assessments(
         if cursor:
             cursor.close()
         if conn:
-            conn.close()
+            return_db_connection(conn)
 
 
 @router.get("/{assessment_id}", response_model=AssessmentResponse)
@@ -253,4 +253,4 @@ async def get_assessment_by_id(assessment_id: int):
         if cursor:
             cursor.close()
         if conn:
-            conn.close()
+            return_db_connection(conn)

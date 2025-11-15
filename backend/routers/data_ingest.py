@@ -6,7 +6,7 @@ Handles ingestion of student data and AI-powered skill assessment generation.
 
 from fastapi import APIRouter, HTTPException
 from models.schemas import DataEntryRequest, DataEntryResponse
-from database.connection import get_db_connection
+from database.connection import get_db_connection, return_db_connection
 from ai import SkillInferenceEngine, load_rubric, FewShotManager
 import os
 import logging
@@ -169,4 +169,4 @@ async def ingest_data_entry(entry: DataEntryRequest):
         if cursor:
             cursor.close()
         if conn:
-            conn.close()
+            return_db_connection(conn)

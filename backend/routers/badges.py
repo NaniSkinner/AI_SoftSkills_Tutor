@@ -6,7 +6,7 @@ Handles badge management and gamification features.
 
 from fastapi import APIRouter, HTTPException
 from models.schemas import BadgeResponse, BadgeGrantRequest, BadgeCollectionResponse
-from database.connection import get_db_connection
+from database.connection import get_db_connection, return_db_connection
 from typing import List, Dict, Any
 import logging
 
@@ -108,7 +108,7 @@ async def get_student_badges(student_id: str):
         if cursor:
             cursor.close()
         if conn:
-            conn.close()
+            return_db_connection(conn)
 
 
 @router.post("/grant", response_model=BadgeResponse)
@@ -214,7 +214,7 @@ async def grant_badge(badge: BadgeGrantRequest):
         if cursor:
             cursor.close()
         if conn:
-            conn.close()
+            return_db_connection(conn)
 
 
 @router.get("/students/{student_id}/badge-progress")
@@ -292,4 +292,4 @@ async def get_badge_progress(student_id: str) -> Dict[str, Any]:
         if cursor:
             cursor.close()
         if conn:
-            conn.close()
+            return_db_connection(conn)

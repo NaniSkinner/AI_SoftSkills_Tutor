@@ -43,7 +43,7 @@ class APIClient:
 
             logger.info(f"Fetching students from {url} (teacher_id={teacher_id})")
             logger.info(f"Using BACKEND_URL: {BACKEND_URL}")
-            response = requests.get(url, params=params, timeout=10)
+            response = requests.get(url, params=params, timeout=30)
             response.raise_for_status()
 
             students = response.json()
@@ -74,7 +74,7 @@ class APIClient:
             url = f"{BACKEND_URL}/api/students/{student_id}/progress"
 
             logger.info(f"Fetching progress for student {student_id}")
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, timeout=30)
 
             if response.status_code == 404:
                 raise Exception(f"Student {student_id} not found")
@@ -101,7 +101,7 @@ class APIClient:
             url = f"{BACKEND_URL}/api/students/{student_id}/active-skills-progress"
 
             logger.info(f"Fetching active skills progress for student {student_id}")
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, timeout=30)
             response.raise_for_status()
 
             return response.json()
@@ -127,7 +127,7 @@ class APIClient:
             url = f"{BACKEND_URL}/api/assessments/student/{student_id}"
 
             logger.info(f"Fetching assessments for student {student_id}")
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, timeout=30)
             response.raise_for_status()
 
             return response.json()
@@ -151,7 +151,7 @@ class APIClient:
             url = f"{BACKEND_URL}/api/assessments/skill-trends/{student_id}"
 
             logger.info(f"Fetching skill trends for student {student_id}")
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, timeout=30)
             response.raise_for_status()
 
             return response.json()
@@ -179,7 +179,7 @@ class APIClient:
                 params["min_confidence"] = min_confidence
 
             logger.info(f"Fetching pending assessments (limit={limit})")
-            response = requests.get(url, params=params, timeout=10)
+            response = requests.get(url, params=params, timeout=30)
             response.raise_for_status()
 
             return response.json()
@@ -203,7 +203,7 @@ class APIClient:
             url = f"{BACKEND_URL}/api/assessments/{assessment_id}"
 
             logger.info(f"Fetching assessment {assessment_id}")
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, timeout=30)
 
             if response.status_code == 404:
                 raise Exception(f"Assessment {assessment_id} not found")
@@ -237,7 +237,7 @@ class APIClient:
             url = f"{BACKEND_URL}/api/corrections/submit"
 
             logger.info(f"Submitting correction for assessment {correction_data.get('assessment_id')}")
-            response = requests.post(url, json=correction_data, timeout=10)
+            response = requests.post(url, json=correction_data, timeout=30)
             response.raise_for_status()
 
             return response.json()
@@ -266,7 +266,7 @@ class APIClient:
             }
 
             logger.info(f"Approving assessment {assessment_id}")
-            response = requests.post(url, json=data, timeout=10)
+            response = requests.post(url, json=data, timeout=30)
             response.raise_for_status()
 
             return response.json()
@@ -291,7 +291,7 @@ class APIClient:
             params = {"limit": limit}
 
             logger.info(f"Fetching recent corrections (limit={limit})")
-            response = requests.get(url, params=params, timeout=10)
+            response = requests.get(url, params=params, timeout=30)
             response.raise_for_status()
 
             return response.json()
@@ -323,7 +323,7 @@ class APIClient:
             url = f"{BACKEND_URL}/api/students/{student_id}/target-skill"
 
             logger.info(f"Assigning target to student {student_id}: {target_data.get('skill_name')}")
-            response = requests.post(url, json=target_data, timeout=10)
+            response = requests.post(url, json=target_data, timeout=30)
             response.raise_for_status()
 
             return response.json()
@@ -351,7 +351,7 @@ class APIClient:
                 params["completed"] = str(completed).lower()
 
             logger.info(f"Fetching targets for student {student_id}")
-            response = requests.get(url, params=params, timeout=10)
+            response = requests.get(url, params=params, timeout=30)
             response.raise_for_status()
 
             return response.json()
@@ -375,7 +375,7 @@ class APIClient:
             url = f"{BACKEND_URL}/api/students/targets/{target_id}/complete"
 
             logger.info(f"Completing target {target_id}")
-            response = requests.put(url, timeout=10)
+            response = requests.put(url, timeout=30)
             response.raise_for_status()
 
             return response.json()
@@ -401,7 +401,7 @@ class APIClient:
             url = f"{BACKEND_URL}/api/badges/students/{student_id}/badges"
 
             logger.info(f"Fetching badges for student {student_id}")
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, timeout=30)
             response.raise_for_status()
 
             return response.json()
@@ -429,7 +429,7 @@ class APIClient:
             url = f"{BACKEND_URL}/api/badges/grant"
 
             logger.info(f"Granting badge to student {badge_data.get('student_id')}: {badge_data.get('skill_name')}")
-            response = requests.post(url, json=badge_data, timeout=10)
+            response = requests.post(url, json=badge_data, timeout=30)
             response.raise_for_status()
 
             return response.json()
@@ -453,7 +453,7 @@ class APIClient:
             url = f"{BACKEND_URL}/api/badges/students/{student_id}/badge-progress"
 
             logger.info(f"Fetching badge progress for student {student_id}")
-            response = requests.get(url, timeout=10)
+            response = requests.get(url, timeout=30)
             response.raise_for_status()
 
             return response.json()

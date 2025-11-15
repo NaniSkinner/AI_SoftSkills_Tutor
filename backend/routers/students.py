@@ -10,7 +10,7 @@ from models.schemas import (
     TargetAssignmentRequest, TargetResponse,
     ActiveSkillProgressResponse
 )
-from database.connection import get_db_connection
+from database.connection import get_db_connection, return_db_connection
 from typing import List, Optional, Dict, Any
 import logging
 
@@ -76,7 +76,7 @@ async def get_students(teacher_id: Optional[str] = Query(None, description="Filt
         if cursor:
             cursor.close()
         if conn:
-            conn.close()
+            return_db_connection(conn)
 
 
 @router.get("/{student_id}/progress", response_model=StudentProgressResponse)
@@ -165,7 +165,7 @@ async def get_student_progress(student_id: str):
         if cursor:
             cursor.close()
         if conn:
-            conn.close()
+            return_db_connection(conn)
 
 
 @router.post("/{student_id}/target-skill", response_model=TargetResponse)
@@ -258,7 +258,7 @@ async def assign_target_skill(student_id: str, target: TargetAssignmentRequest):
         if cursor:
             cursor.close()
         if conn:
-            conn.close()
+            return_db_connection(conn)
 
 
 @router.get("/{student_id}/targets", response_model=List[TargetResponse])
@@ -313,7 +313,7 @@ async def get_student_targets(
         if cursor:
             cursor.close()
         if conn:
-            conn.close()
+            return_db_connection(conn)
 
 
 @router.put("/targets/{target_id}/complete")
@@ -371,7 +371,7 @@ async def complete_target(target_id: int):
         if cursor:
             cursor.close()
         if conn:
-            conn.close()
+            return_db_connection(conn)
 
 
 @router.get("/{student_id}/active-skills-progress", response_model=List[ActiveSkillProgressResponse])
@@ -474,4 +474,4 @@ async def get_active_skills_progress(student_id: str):
         if cursor:
             cursor.close()
         if conn:
-            conn.close()
+            return_db_connection(conn)

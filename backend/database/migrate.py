@@ -136,21 +136,16 @@ def run_migrations():
         else:
             logger.info("✓ Seed data (students/teachers) exists")
 
-        # Step 3: Clear and reload sample assessments for clean longitudinal data
-        # This ensures we always have the correct seed data structure
-        cursor.execute("SELECT COUNT(*) FROM assessments")
-        existing_count = cursor.fetchone()[0]
+        # Step 3: Load sample assessments if they don't exist
+        # Use idempotent check - only load if seed data is missing
+        cursor.execute("SELECT COUNT(*) FROM assessments WHERE data_entry_id LIKE 'S00%_202%'")
+        seed_count = cursor.fetchone()[0]
 
-        if existing_count > 0:
-            logger.warning(f"⚠ Found {existing_count} existing assessments - clearing for fresh seed data...")
-            # Delete assessments and data entries with seed IDs
-            cursor.execute("DELETE FROM assessments WHERE data_entry_id LIKE 'S00%_202%'")
-            cursor.execute("DELETE FROM data_entries WHERE id LIKE 'S00%_202%'")
-            conn.commit()
-            logger.info("✓ Cleared old seed data")
-
-        logger.info("Loading longitudinal seed data (6 months of progress)...")
-        run_sql_file(cursor, conn, seed_sql, "sample assessments (seed_assessments.sql)")
+        if seed_count == 0:
+            logger.info("Loading longitudinal seed data (6 months of progress)...")
+            run_sql_file(cursor, conn, seed_sql, "sample assessments (seed_assessments.sql)")
+        else:
+            logger.info(f"✓ Sample assessments already exist ({seed_count} found) - skipping seed load")
 
         # Verify assessments were loaded
         cursor.execute("SELECT COUNT(*) FROM assessments")

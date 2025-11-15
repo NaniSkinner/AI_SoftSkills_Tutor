@@ -6,7 +6,7 @@ Handles teacher corrections and approvals of AI assessments.
 
 from fastapi import APIRouter, HTTPException
 from models.schemas import CorrectionRequest, CorrectionResponse, ApprovalRequest
-from database.connection import get_db_connection
+from database.connection import get_db_connection, return_db_connection
 from typing import List, Dict, Any
 import logging
 
@@ -103,7 +103,7 @@ async def submit_correction(correction: CorrectionRequest):
         if cursor:
             cursor.close()
         if conn:
-            conn.close()
+            return_db_connection(conn)
 
 
 @router.post("/assessments/{assessment_id}/approve")
@@ -160,7 +160,7 @@ async def approve_assessment(assessment_id: int, approval: ApprovalRequest):
         if cursor:
             cursor.close()
         if conn:
-            conn.close()
+            return_db_connection(conn)
 
 
 @router.get("/recent")
@@ -216,4 +216,4 @@ async def get_recent_corrections(limit: int = 10) -> List[Dict[str, Any]]:
         if cursor:
             cursor.close()
         if conn:
-            conn.close()
+            return_db_connection(conn)

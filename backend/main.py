@@ -68,13 +68,46 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint with database connectivity and schema verification"""
-    from database.connection import get_db_connection
+    """
+    Lightweight health check endpoint for Render monitoring.
+
+    Only tests basic database connectivity without expensive queries.
+    For detailed status, use /api/status endpoint.
+    """
+    try:
+        # Simple connection test - no heavy queries
+        if test_connection():
+            return {
+                "status": "healthy",
+                "database": "connected"
+            }
+        else:
+            return {
+                "status": "unhealthy",
+                "database": "disconnected"
+            }
+    except Exception as e:
+        logger.error(f"Health check error: {e}")
+        return {
+            "status": "unhealthy",
+            "database": "error",
+            "error": str(e)
+        }
+
+
+@app.get("/api/status")
+async def detailed_status():
+    """
+    Detailed status endpoint with full database stats.
+    Use this for monitoring dashboards, not for health checks.
+    """
+    from database.connection import get_db_connection, return_db_connection
 
     db_status = "disconnected"
     tables_exist = False
     student_count = 0
     assessment_count = 0
+    conn = None
 
     try:
         if test_connection():
@@ -100,9 +133,11 @@ async def health_check():
                 assessment_count = cursor.fetchone()[0]
 
             cursor.close()
-            conn.close()
+            return_db_connection(conn)
     except Exception as e:
-        logger.error(f"Health check error: {e}")
+        logger.error(f"Status check error: {e}")
+        if conn:
+            return_db_connection(conn)
 
     return {
         "status": "healthy" if db_status == "connected" and tables_exist else "degraded",
@@ -185,14 +220,19 @@ async def initialize_data(admin_key: str):
 @app.on_event("startup")
 async def startup_event():
     """Startup event handler - runs when the API starts"""
+    import asyncio
+
     logger.info("=" * 80)
     logger.info("Flourish Skills Tracker API Starting...")
     logger.info("=" * 80)
 
-    # Run database migrations first (creates schema and loads seed data if needed)
+    # Run database migrations in thread pool to avoid blocking async event loop
+    # This prevents startup timeouts on resource-constrained free tier
     try:
         from database.migrate import run_migrations
-        run_migrations()
+        logger.info("Running database migrations (non-blocking)...")
+        await asyncio.to_thread(run_migrations)
+        logger.info("✓ Database migrations completed")
     except Exception as e:
         logger.error(f"✗ Database migration failed: {e}")
         logger.error("  Backend cannot start without a working database!")
@@ -231,3 +271,10 @@ async def shutdown_event():
     logger.info("=" * 80)
     logger.info("Flourish Skills Tracker API Shutting Down...")
     logger.info("=" * 80)
+
+    # Close all database connections in the pool
+    try:
+        from database.connection import close_all_connections
+        close_all_connections()
+    except Exception as e:
+        logger.error(f"Error closing connections: {e}")

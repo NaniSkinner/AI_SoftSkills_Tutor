@@ -7,6 +7,9 @@ services:
     dockerfilePath: ./backend/Dockerfile
     dockerContext: .
     healthCheckPath: /health
+    healthCheckInterval: 60  # Check every 60s (was 30s default)
+    healthCheckTimeout: 30   # Allow 30s for response (was 10s default)
+    healthCheckFailureThreshold: 5  # Allow 5 failures before unhealthy (was 3 default)
     envVars:
       - key: DATABASE_URL
         fromDatabase:
@@ -19,7 +22,7 @@ services:
       - key: USE_LLM_CONFIDENCE
         value: false
       - key: ALLOWED_ORIGINS
-        value: https://flourish-skills-frontend.onrender.com,*
+        value: https://flourish-skills-frontend.onrender.com
       - key: ADMIN_INIT_KEY
         value: flourish-admin-2024
 
