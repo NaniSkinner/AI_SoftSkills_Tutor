@@ -136,21 +136,26 @@ def run_migrations():
         else:
             logger.info("✓ Seed data (students/teachers) exists")
 
-        # Step 3: Check if sample assessments exist
-        assessments_exist = check_sample_assessments_exist(cursor)
+        # Step 3: Clear and reload sample assessments for clean longitudinal data
+        # This ensures we always have the correct seed data structure
+        cursor.execute("SELECT COUNT(*) FROM assessments")
+        existing_count = cursor.fetchone()[0]
 
-        if not assessments_exist:
-            logger.warning("⚠ Sample assessments not found - loading seed data...")
-            run_sql_file(cursor, conn, seed_sql, "sample assessments (seed_assessments.sql)")
+        if existing_count > 0:
+            logger.warning(f"⚠ Found {existing_count} existing assessments - clearing for fresh seed data...")
+            # Delete assessments and data entries with seed IDs
+            cursor.execute("DELETE FROM assessments WHERE data_entry_id LIKE 'S00%_202%'")
+            cursor.execute("DELETE FROM data_entries WHERE id LIKE 'S00%_202%'")
+            conn.commit()
+            logger.info("✓ Cleared old seed data")
 
-            # Verify assessments were loaded
-            cursor.execute("SELECT COUNT(*) FROM assessments")
-            count = cursor.fetchone()[0]
-            logger.info(f"✓ Loaded {count} sample assessments successfully!")
-        else:
-            cursor.execute("SELECT COUNT(*) FROM assessments")
-            count = cursor.fetchone()[0]
-            logger.info(f"✓ Sample assessments already exist ({count} assessments)")
+        logger.info("Loading longitudinal seed data (6 months of progress)...")
+        run_sql_file(cursor, conn, seed_sql, "sample assessments (seed_assessments.sql)")
+
+        # Verify assessments were loaded
+        cursor.execute("SELECT COUNT(*) FROM assessments")
+        count = cursor.fetchone()[0]
+        logger.info(f"✓ Loaded {count} sample assessments successfully!")
 
         # Final summary
         logger.info("=" * 70)
