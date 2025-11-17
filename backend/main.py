@@ -221,26 +221,33 @@ async def initialize_data(admin_key: str):
 async def startup_event():
     """Startup event handler - runs when the API starts"""
     import asyncio
+    import time
 
+    startup_start = time.time()
     logger.info("=" * 80)
     logger.info("Flourish Skills Tracker API Starting...")
+    logger.info(f"Startup time: {time.strftime('%Y-%m-%d %H:%M:%S')}")
     logger.info("=" * 80)
 
     # Run database migrations in thread pool to avoid blocking async event loop
     # This prevents startup timeouts on resource-constrained free tier
     try:
         from database.migrate import run_migrations
+        migration_start = time.time()
         logger.info("Running database migrations (non-blocking)...")
         await asyncio.to_thread(run_migrations)
-        logger.info("✓ Database migrations completed")
+        migration_elapsed = time.time() - migration_start
+        logger.info(f"✓ Database migrations completed in {migration_elapsed:.2f}s")
     except Exception as e:
         logger.error(f"✗ Database migration failed: {e}")
         logger.error("  Backend cannot start without a working database!")
         raise  # Stop startup if migration fails
 
     # Test database connection
+    conn_start = time.time()
     if test_connection():
-        logger.info("✓ Database connection successful")
+        conn_elapsed = time.time() - conn_start
+        logger.info(f"✓ Database connection successful ({conn_elapsed:.2f}s)")
     else:
         logger.error("✗ Database connection failed!")
 
@@ -262,6 +269,9 @@ async def startup_event():
     logger.info("  → Badges: /api/badges/*")
     logger.info("=" * 80)
     logger.info("API Documentation: http://localhost:8000/docs")
+
+    total_startup = time.time() - startup_start
+    logger.info(f"✓ Total startup time: {total_startup:.2f}s")
     logger.info("=" * 80)
 
 

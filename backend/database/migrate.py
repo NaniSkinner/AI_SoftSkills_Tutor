@@ -7,11 +7,16 @@ have the necessary tables and sample data without manual intervention.
 """
 
 import os
+import time
 import psycopg2
+from psycopg2 import extensions
 import logging
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
+
+# Cache to track if we've already verified migrations in this session
+_migration_verified = False
 
 
 def check_tables_exist(cursor) -> bool:
@@ -57,7 +62,7 @@ def check_sample_assessments_exist(cursor) -> bool:
 
 def run_sql_file(cursor, conn, sql_file_path: Path, description: str):
     """
-    Execute a SQL file.
+    Execute a SQL file with statement timeout.
 
     Args:
         cursor: Database cursor
@@ -70,15 +75,23 @@ def run_sql_file(cursor, conn, sql_file_path: Path, description: str):
         raise FileNotFoundError(f"SQL file not found: {sql_file_path}")
 
     logger.info(f"Executing {description}: {sql_file_path.name}")
+    start_time = time.time()
 
     with open(sql_file_path, 'r', encoding='utf-8') as f:
         sql_script = f.read()
+
+    # Set statement timeout to prevent hanging (60 seconds)
+    cursor.execute("SET statement_timeout = '60s'")
 
     # Execute the entire script
     cursor.execute(sql_script)
     conn.commit()
 
-    logger.info(f"✓ {description} completed successfully")
+    # Reset statement timeout
+    cursor.execute("RESET statement_timeout")
+
+    elapsed = time.time() - start_time
+    logger.info(f"✓ {description} completed successfully in {elapsed:.2f}s")
 
 
 def run_migrations():
@@ -93,7 +106,17 @@ def run_migrations():
     4. If not, load seed_assessments.sql
 
     This runs automatically on backend startup to ensure database is ready.
+
+    Uses session cache to skip expensive checks on subsequent calls.
     """
+    global _migration_verified
+
+    # Skip full migration check if already verified in this session
+    if _migration_verified:
+        logger.info("✓ Database migrations already verified in this session - skipping check")
+        return
+
+    start_time = time.time()
     logger.info("=" * 70)
     logger.info("DATABASE MIGRATION CHECK")
     logger.info("=" * 70)
@@ -102,14 +125,22 @@ def run_migrations():
     cursor = None
 
     try:
-        # Connect to database
+        # Connect to database with timeout
         database_url = os.getenv("DATABASE_URL")
         if not database_url:
             logger.error("DATABASE_URL environment variable not set!")
             raise ValueError("DATABASE_URL not configured")
 
-        conn = psycopg2.connect(database_url)
+        conn = psycopg2.connect(database_url, connect_timeout=10)
+        # Set default statement timeout for all queries in this connection
+        conn.set_session(
+            isolation_level=extensions.ISOLATION_LEVEL_READ_COMMITTED,
+            readonly=False,
+            deferrable=False,
+            autocommit=False
+        )
         cursor = conn.cursor()
+        cursor.execute("SET statement_timeout = '30s'")
 
         # Get SQL file paths
         db_dir = Path(__file__).parent
@@ -156,7 +187,7 @@ def run_migrations():
         logger.info("=" * 70)
         logger.info("DATABASE MIGRATION COMPLETE")
 
-        # Log database statistics
+        # Log database statistics (lightweight counts)
         cursor.execute("SELECT COUNT(*) FROM students")
         student_count = cursor.fetchone()[0]
         cursor.execute("SELECT COUNT(*) FROM teachers")
@@ -170,7 +201,13 @@ def run_migrations():
         logger.info(f"  Students: {student_count}")
         logger.info(f"  Data Entries: {entry_count}")
         logger.info(f"  Assessments: {assessment_count}")
+
+        total_elapsed = time.time() - start_time
+        logger.info(f"  Total migration time: {total_elapsed:.2f}s")
         logger.info("=" * 70)
+
+        # Mark migrations as verified for this session
+        _migration_verified = True
 
     except Exception as e:
         logger.error(f"✗ Migration failed: {e}", exc_info=True)

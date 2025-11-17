@@ -5,6 +5,7 @@ Uses connection pooling to efficiently manage database connections
 and prevent connection exhaustion on free tier (max 20 connections).
 """
 import os
+import time
 import psycopg2
 from psycopg2 import pool
 from psycopg2.extras import RealDictCursor
@@ -19,34 +20,55 @@ _connection_pool: Optional[pool.SimpleConnectionPool] = None
 
 def init_connection_pool():
     """
-    Initialize the connection pool.
+    Initialize the connection pool with retry logic.
 
     Called automatically on first connection request.
     Safe to call multiple times (idempotent).
+
+    Retries with exponential backoff to handle database startup delays.
     """
     global _connection_pool
 
     if _connection_pool is not None:
         return  # Already initialized
 
-    try:
-        database_url = os.getenv("DATABASE_URL")
-        if not database_url:
-            raise ValueError("DATABASE_URL environment variable not set")
+    database_url = os.getenv("DATABASE_URL")
+    if not database_url:
+        raise ValueError("DATABASE_URL environment variable not set")
 
-        # Create connection pool
-        # Free tier PostgreSQL on Render has ~20 max connections
-        # Use conservative limits to avoid exhaustion
-        _connection_pool = pool.SimpleConnectionPool(
-            minconn=2,   # Keep 2 connections warm
-            maxconn=10,  # Max 10 connections (safe for free tier)
-            dsn=database_url,
-            cursor_factory=RealDictCursor
-        )
-        logger.info("✓ Database connection pool initialized (2-10 connections)")
-    except Exception as e:
-        logger.error(f"Failed to initialize connection pool: {e}")
-        raise
+    # Retry configuration for database startup
+    max_retries = 5
+    retry_delay = 1  # Start with 1 second
+
+    for attempt in range(1, max_retries + 1):
+        try:
+            logger.info(f"Initializing database connection pool (attempt {attempt}/{max_retries})...")
+
+            # Create connection pool
+            # Free tier PostgreSQL on Render has ~20 max connections
+            # Use conservative limits to avoid exhaustion
+            _connection_pool = pool.SimpleConnectionPool(
+                minconn=2,   # Keep 2 connections warm
+                maxconn=10,  # Max 10 connections (safe for free tier)
+                dsn=database_url,
+                cursor_factory=RealDictCursor,
+                connect_timeout=10  # 10 second connection timeout
+            )
+            logger.info("✓ Database connection pool initialized (2-10 connections)")
+            return  # Success!
+
+        except (psycopg2.OperationalError, psycopg2.DatabaseError) as e:
+            if attempt < max_retries:
+                logger.warning(f"Connection attempt {attempt} failed: {e}")
+                logger.info(f"Retrying in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+                retry_delay = min(retry_delay * 2, 16)  # Exponential backoff, max 16s
+            else:
+                logger.error(f"Failed to initialize connection pool after {max_retries} attempts: {e}")
+                raise
+        except Exception as e:
+            logger.error(f"Unexpected error initializing connection pool: {e}")
+            raise
 
 
 def get_db_connection():
