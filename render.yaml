@@ -39,7 +39,7 @@ services:
     healthCheckFailureThreshold: 5
     envVars:
       - key: BACKEND_URL
-        value: http://flourish-skills-backend:8000
+        value: http://flourish-skills-backend:10000
       - key: BACKEND_TIMEOUT
         value: "90"
 

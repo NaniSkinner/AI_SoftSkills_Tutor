@@ -20,8 +20,8 @@ COPY backend/ .
 # Works with dockerContext: . (root) - copies from mock_data/
 COPY mock_data/ /app/mock_data/
 
-# Expose port
+# Expose port (Render will use PORT env var, typically 10000)
 EXPOSE 8000
 
-# Default command (overridden by docker-compose)
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Use startup script that reads PORT environment variable
+CMD ["python", "start.py"]
