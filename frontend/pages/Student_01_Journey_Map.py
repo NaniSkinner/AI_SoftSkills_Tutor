@@ -378,14 +378,22 @@ try:
             "21st Century Skills": []
         }
 
+        # Debug: Show raw skill trends data
+        st.write("DEBUG: Number of skills received:", len(skill_trends))
+        if skill_trends:
+            st.write("DEBUG: First skill data:", skill_trends[0])
+
         for skill in skill_trends:
             category = skill['skill_category']
+            st.write(f"DEBUG: Processing skill '{skill['skill_name']}' with category '{category}'")
             if category == "SEL":
                 skills_by_category["Social-Emotional Learning (SEL)"].append(skill)
             elif category == "EF":
                 skills_by_category["Executive Function (EF)"].append(skill)
             elif category == "21st Century":
                 skills_by_category["21st Century Skills"].append(skill)
+            else:
+                st.warning(f"DEBUG: Unknown category '{category}' for skill '{skill['skill_name']}'")
 
         # Display skills by category
         st.markdown("---")
