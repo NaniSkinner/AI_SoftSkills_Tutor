@@ -380,11 +380,12 @@ try:
 
         for skill in skill_trends:
             category = skill['skill_category'].strip()  # Remove any whitespace
-            if category == "SEL":
+            # Handle both abbreviations and full names
+            if category in ["SEL", "Social-Emotional Learning"]:
                 skills_by_category["Social-Emotional Learning (SEL)"].append(skill)
-            elif category == "EF":
+            elif category in ["EF", "Executive Function"]:
                 skills_by_category["Executive Function (EF)"].append(skill)
-            elif category == "21st Century":
+            elif category in ["21st Century", "21st Century Skills"]:
                 skills_by_category["21st Century Skills"].append(skill)
             else:
                 # Log unknown categories for debugging
